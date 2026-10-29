@@ -4,8 +4,8 @@ function DashboardSkeleton() {
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
       <div className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }, (_, i) => (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-6">
+          {Array.from({ length: 6 }, (_, i) => (
             <Skeleton key={i} className="h-28 rounded-xl" />
           ))}
         </div>

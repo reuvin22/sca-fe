@@ -12,7 +12,7 @@ function RingRow({ rings, unit = '' }) {
               {unit}
             </span>
           </ProgressRing>
-          <span className="text-xs font-medium text-gray-500 uppercase">{ring.label}</span>
+          <span className="max-w-24 text-center text-xs font-medium text-gray-500 uppercase">{ring.label}</span>
         </div>
       ))}
     </div>

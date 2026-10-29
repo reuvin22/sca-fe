@@ -1,4 +1,5 @@
 import { useDispatch } from 'react-redux'
+import { toast } from 'react-toastify'
 import { Trash2 } from 'lucide-react'
 import Card from '../ui/Card'
 import TagInput from '../ui/TagInput'
@@ -9,7 +10,9 @@ function CategoryCard({ category }) {
   const { id, name, options } = category
 
   const handleDelete = () => {
-    if (window.confirm(`Delete "${name}" and all its options?`)) dispatch(removeCategory(id))
+    if (!window.confirm(`Delete "${name}" and all its options?`)) return
+    dispatch(removeCategory(id))
+    toast.success(`${name} category deleted`)
   }
 
   return (
@@ -29,8 +32,14 @@ function CategoryCard({ category }) {
         id={`option-${id}`}
         items={options}
         placeholder={`Add ${name} option`}
-        onAdd={(option) => dispatch(addOption({ categoryId: id, option }))}
-        onRemove={(option) => dispatch(removeOption({ categoryId: id, option }))}
+        onAdd={(option) => {
+          dispatch(addOption({ categoryId: id, option }))
+          toast.success(`${option} added to ${name}`)
+        }}
+        onRemove={(option) => {
+          dispatch(removeOption({ categoryId: id, option }))
+          toast.success(`${option} removed from ${name}`)
+        }}
       />
     </Card>
   )

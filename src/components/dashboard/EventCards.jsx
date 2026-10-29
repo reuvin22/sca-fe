@@ -1,25 +1,37 @@
-import { Plus } from 'lucide-react'
+import { CalendarDays } from 'lucide-react'
+import { FOLLOW_UP, getCaseStatus } from '../../utils/caseHelpers'
+import { formatDate } from '../../utils/dateHelpers'
 
-const pillButton = 'w-full cursor-pointer rounded-full py-2 text-sm font-medium text-white transition hover:opacity-90'
-
-function EventCards({ appointment }) {
+// Upcoming case follow-ups. `events` is a list of cases.
+// Cards match the appointment calendar design. Clicking one calls `onSelect(case)`.
+function EventCards({ events, onSelect }) {
   return (
-    <div className="overflow-hidden rounded-xl shadow-sm">
-      <div className="bg-sky-400 p-5 text-white">
-        <p className="text-xs uppercase opacity-90">{appointment.date}</p>
-        <p className="mt-1 text-3xl font-bold">{appointment.time}</p>
-        <p className="text-sm opacity-90">with {appointment.student}</p>
-        <button className={`mt-4 bg-purple-600 ${pillButton}`}>Send reminder</button>
-      </div>
+    <section className="rounded-xl bg-surface p-5 shadow-sm">
+      <h2 className="text-sm font-semibold tracking-wide text-gray-900 uppercase">Upcoming Follow-ups</h2>
 
-      <div className="bg-emerald-400 p-5 text-center text-white">
-        <div className="flex justify-end">
-          <Plus size={18} />
-        </div>
-        <p className="text-2xl font-bold">New Event</p>
-        <button className={`mt-4 bg-fuchsia-600 ${pillButton}`}>Add</button>
-      </div>
-    </div>
+      {events.length === 0 ? (
+        <p className="mt-3 text-sm text-gray-500">No upcoming follow-ups.</p>
+      ) : (
+        <ul className="mt-3 space-y-3">
+          {events.map((item) => (
+            <li key={item.id}>
+              <button
+                type="button"
+                onClick={() => onSelect(item)}
+                className={`w-full cursor-pointer rounded-lg border border-l-4 border-gray-200 bg-surface p-3 text-left text-xs shadow-sm hover:shadow-md ${FOLLOW_UP[getCaseStatus(item)]?.accent}`}
+              >
+              <p className="truncate text-sm font-semibold">{item.learnerName}</p>
+              <p className="mt-1 flex items-center gap-1 text-gray-600">
+                <CalendarDays size={12} className="shrink-0" />
+                {formatDate(item.followUpDate)}
+              </p>
+              <p className="mt-1 text-gray-500">{item.caseNumber}</p>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   )
 }
 

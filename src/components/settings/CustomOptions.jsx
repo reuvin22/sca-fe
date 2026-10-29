@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
 import Card from '../ui/Card'
 import AddInput from '../ui/AddInput'
 import CategoryCard from './CategoryCard'
@@ -15,7 +16,10 @@ function CustomOptions() {
           id="category"
           items={categories.map((category) => category.name)}
           placeholder="e.g. Grade & Section"
-          onAdd={(name) => dispatch(addCategory(name))}
+          onAdd={(name) => {
+            dispatch(addCategory(name))
+            toast.success(`${name} category added`)
+          }}
         />
       </Card>
 

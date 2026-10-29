@@ -14,12 +14,12 @@ function TagInput({ id, items, onAdd, onRemove, placeholder }) {
           {items.map((item) => (
             <li
               key={item}
-              className="flex items-center gap-1 rounded-full bg-purple-50 py-1 pr-1 pl-3 text-sm text-purple-700"
+              className="flex items-center gap-1 rounded-full bg-brand-50 py-1 pr-1 pl-3 text-sm text-brand-700"
             >
               {item}
               <button
                 onClick={() => onRemove(item)}
-                className="cursor-pointer rounded-full p-0.5 hover:bg-purple-100"
+                className="cursor-pointer rounded-full p-0.5 hover:bg-brand-100"
                 aria-label={`Remove ${item}`}
               >
                 <X size={14} />

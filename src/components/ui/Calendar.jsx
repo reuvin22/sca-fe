@@ -21,9 +21,9 @@ function Calendar({ from = '', to = '', onSelect }) {
   const changeMonth = (offset) => setMonth(new Date(year, month.getMonth() + offset, 1))
 
   const dayClass = (day) => {
-    if (day === from || day === end) return 'bg-purple-600 font-semibold text-white'
-    if (from && day > from && day < end) return 'bg-purple-100 text-purple-700'
-    if (day === today) return 'font-semibold text-purple-600 ring-1 ring-purple-300'
+    if (day === from || day === end) return 'bg-brand-600 font-semibold text-white'
+    if (from && day > from && day < end) return 'bg-brand-100 text-brand-700'
+    if (day === today) return 'font-semibold text-gray-900 ring-1 ring-gray-300'
     return 'text-gray-600 hover:bg-gray-100'
   }
 

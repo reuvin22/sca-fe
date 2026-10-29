@@ -31,6 +31,12 @@ Before building a feature, inspect the existing structure, docs, and code. Do no
 - All buttons and clickable elements must have `cursor-pointer`.
 - Buttons that trigger an API call (create, update, delete, etc.) must show a loading spinner inside the button. Use `<Button loading={...}>`.
 - Deleting always asks for confirmation first (`ConfirmModal`).
+- Successful create / update / delete shows a success toast (`toast.success()` from `react-toastify`). `useCrud(service, 'Label')` does this automatically.
+- All calendars use the shared `Calendar` component. Forms use `DatePicker` (single date), filters use `DateRangePicker`. Never use native `<input type="date">`.
+- Every table has an Export button (`ExportMenu`) with PDF, Excel and CSV, using `exportTable()` from `utils/export`. Define table columns once with a plain `value(row)` so the table and exports share them.
+- All displayed dates use `formatDate()` from `utils/dateHelpers` (format: `Jun 03, 2026`).
+- Text form fields use `FormField`. If a Settings category has the same name as the field label (e.g. "Grade & Section", "Sex"), it shows a select with the Settings options.
+- Theme colors (Light / Dark / Custom palettes in `index.css`): use `bg-surface` (not `bg-white`), `bg-page`, `bg-primary` / `hover:bg-primary-hover`, and `*-brand-*` for accents. Use `gray-*` for text/borders so dark mode works.
 - Use skeleton loaders while data is loading.
 - Optimize images: `loading="lazy"`, set `width`/`height`, use compressed formats (WebP).
 

@@ -1,1 +1,65 @@
 @import "tailwindcss";
+
+/* Theme colors (light mode). Use bg-page, bg-surface, bg-primary and *-brand-* in components. */
+@theme {
+  --color-page: #f3f4f6;
+  --color-surface: #ffffff;
+  --color-primary: #111827;
+  --color-primary-hover: #1f2937;
+
+  --color-brand-50: #faf5ff;
+  --color-brand-100: #f3e8ff;
+  --color-brand-300: #d8b4fe;
+  --color-brand-400: #c084fc;
+  --color-brand-500: #a855f7;
+  --color-brand-600: #9333ea;
+  --color-brand-700: #7e22ce;
+}
+
+/* Dark mode: flips the gray scale so existing gray classes still work */
+[data-theme='dark'] {
+  color-scheme: dark;
+  --color-page: #030712;
+  --color-surface: #111827;
+  --color-primary: #9333ea;
+  --color-primary-hover: #7e22ce;
+
+  --color-gray-50: #1f2937;
+  --color-gray-100: #1f2937;
+  --color-gray-200: #374151;
+  --color-gray-300: #4b5563;
+  --color-gray-400: #6b7280;
+  --color-gray-500: #9ca3af;
+  --color-gray-600: #d1d5db;
+  --color-gray-700: #e5e7eb;
+  --color-gray-800: #f3f4f6;
+  --color-gray-900: #f9fafb;
+
+  --color-brand-50: #2e1065;
+  --color-brand-100: #3b0764;
+  --color-brand-700: #d8b4fe;
+}
+
+/* Custom palette (optional, works with Light or Dark). Its 5 colors (darkest to lightest) are set by applyTheme(). */
+[data-palette] {
+  --color-page: var(--palette-5);
+  --color-primary: var(--palette-2);
+  --color-primary-hover: var(--palette-1);
+
+  --color-brand-50: var(--palette-5);
+  --color-brand-100: var(--palette-4);
+  --color-brand-300: var(--palette-4);
+  --color-brand-400: var(--palette-3);
+  --color-brand-500: var(--palette-3);
+  --color-brand-600: var(--palette-2);
+  --color-brand-700: var(--palette-1);
+}
+
+/* Dark + palette: keep dark backgrounds, use the palette for accents */
+[data-theme='dark'][data-palette] {
+  --color-page: #030712;
+  --color-primary-hover: var(--palette-3);
+  --color-brand-50: color-mix(in srgb, var(--palette-2) 25%, #111827);
+  --color-brand-100: color-mix(in srgb, var(--palette-2) 40%, #111827);
+  --color-brand-700: var(--palette-4);
+}

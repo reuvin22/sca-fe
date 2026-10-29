@@ -1,15 +1,13 @@
-import { ArrowUpRight } from 'lucide-react'
-
-function StatCard({ label, value, color }) {
+function StatCard({ label, value, icon: Icon }) {
   return (
-    <div className={`rounded-xl bg-linear-to-br p-5 text-white shadow-sm ${color}`}>
-      <div className="flex items-start justify-between">
-        <p className="text-sm font-medium tracking-wide uppercase opacity-90">{label}</p>
-        <span className="rounded-md bg-white/25 p-1">
-          <ArrowUpRight size={16} />
-        </span>
+    <div className="flex items-center gap-4 rounded-xl bg-surface p-5 text-gray-900 shadow-sm">
+      <span className="shrink-0 rounded-lg bg-gray-100 p-2.5 text-gray-600">
+        <Icon size={22} />
+      </span>
+      <div className="min-w-0">
+        <p className="truncate text-sm font-medium tracking-wide text-gray-500 uppercase" title={label}>{label}</p>
+        <p className="text-3xl font-bold">{value}</p>
       </div>
-      <p className="mt-3 text-3xl font-bold">{value}</p>
     </div>
   )
 }

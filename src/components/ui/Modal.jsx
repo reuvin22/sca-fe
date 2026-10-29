@@ -5,7 +5,7 @@ function Modal({ title, onClose, children, className = 'max-w-lg' }) {
     <div onClick={onClose} className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4">
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`max-h-[90vh] w-full overflow-y-auto rounded-xl bg-white p-6 shadow-lg ${className}`}
+        className={`max-h-[90vh] w-full overflow-y-auto rounded-xl bg-surface p-6 shadow-lg ${className}`}
       >
         <header className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">{title}</h2>

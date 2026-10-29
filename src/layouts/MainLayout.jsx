@@ -4,7 +4,7 @@ import Navbar from '../components/common/Navbar'
 
 function MainLayout() {
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-page">
       <Sidebar />
       {/* pl-16 leaves room for the fixed collapsed sidebar on mobile */}
       <div className="min-w-0 flex-1 pl-16 md:pl-0">

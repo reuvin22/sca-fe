@@ -1,22 +1,42 @@
-import { toISO } from './dateHelpers'
+import { formatDate, toDateString } from './dateHelpers'
 
-// Date as "YYYY-MM-DD" in local time. `offset` is days from today.
-export const toDateString = (offset = 0) => {
-  const date = new Date()
-  date.setDate(date.getDate() + offset)
-  return toISO(date)
-}
+// Case fields shown in the table and modal. Fields without a `type` are dropdowns
+// when a Settings category matches the label.
+export const CASE_DROPDOWNS = [
+  { id: 'learnerName', label: 'Name of Learner', type: 'text' },
+  { id: 'gradeSection', label: 'Grade & Section' },
+  { id: 'concern', label: 'Nature of Concern' },
+  { id: 'action', label: 'Action / Service Rendered' },
+  { id: 'referredTo', label: 'Referred To / Remarks' },
+  { id: 'classification', label: 'Intake Classification' },
+]
 
-const random4 = () => String(Math.floor(Math.random() * 10000)).padStart(4, '0')
-
-// e.g. CASE#1234-9808
-export const generateCaseNumber = () => `CASE#${random4()}-${random4()}`
-
+// `tone` colors the status cell in exports (see utils/export/exportTheme)
+// `accent` is the card border and title color
 export const FOLLOW_UP = {
-  overdue: { label: 'Overdue', className: 'bg-red-100 text-red-700' },
-  today: { label: 'Due Today', className: 'bg-orange-100 text-orange-700' },
-  scheduled: { label: 'Scheduled', className: 'bg-sky-100 text-sky-700' },
+  overdue: { label: 'Overdue', className: 'bg-red-100 text-red-700', tone: 'red', accent: 'border-l-red-500 text-red-600' },
+  today: { label: 'Due Today', className: 'bg-orange-100 text-orange-700', tone: 'orange', accent: 'border-l-orange-500 text-orange-600' },
+  scheduled: { label: 'Scheduled', className: 'bg-sky-100 text-sky-700', tone: 'sky', accent: 'border-l-sky-500 text-sky-600' },
+  accomplished: { label: 'Accomplished', className: 'bg-green-100 text-green-700', tone: 'green', accent: 'border-l-green-500 text-green-600' },
 }
+
+export const STATUS_OPTIONS = Object.entries(FOLLOW_UP).map(([value, { label }]) => ({ value, label }))
+
+// Table and export columns (plain text). The table adds badges/styles on top.
+export const CASE_COLUMNS = [
+  { id: 'caseNumber', label: 'Case No.', width: 18, value: (item) => item.caseNumber },
+  { id: 'intakeDate', label: 'Intake Date', width: 14, value: (item) => formatDate(item.intakeDate) },
+  ...CASE_DROPDOWNS.map(({ id, label }) => ({ id, label, width: 24, value: (item) => item[id] })),
+  { id: 'followUpDate', label: 'Follow-up Date', width: 15, value: (item) => (item.followUpDate ? formatDate(item.followUpDate) : '') },
+  { id: 'remarks', label: 'Remarks', width: 40, value: (item) => item.remarks },
+  {
+    id: 'status',
+    label: 'Status',
+    width: 15,
+    value: (item) => FOLLOW_UP[getCaseStatus(item)]?.label ?? '',
+    color: (item) => FOLLOW_UP[getCaseStatus(item)]?.tone,
+  },
+]
 
 export function getFollowUpStatus(followUpDate) {
   const today = toDateString()
@@ -25,13 +45,44 @@ export function getFollowUpStatus(followUpDate) {
   return 'scheduled'
 }
 
+// Status set in the modal wins; otherwise it's based on the follow-up date.
+export function getCaseStatus(item) {
+  if (item.status) return item.status
+  return item.followUpDate ? getFollowUpStatus(item.followUpDate) : ''
+}
+
+// Totals for the dashboard summary cards
+export function getCaseStats(cases) {
+  const thisMonth = toDateString().slice(0, 7)
+  const count = (check) => cases.filter(check).length
+  const statusIs = (...statuses) => (item) => statuses.includes(getCaseStatus(item))
+
+  return {
+    total: cases.length,
+    forFollowUp: count(statusIs('today', 'scheduled')),
+    overdue: count(statusIs('overdue')),
+    closed: count(statusIs('accomplished')),
+    thisMonth: count((item) => item.intakeDate.startsWith(thisMonth)),
+    referrals: count((item) => item.referredTo && item.referredTo !== 'Not Referred'),
+  }
+}
+
+export const CASE_STAT_LABELS = {
+  total: 'Total Cases',
+  forFollowUp: 'For Follow-up',
+  overdue: 'Overdue',
+  closed: 'Closed / Resolved',
+  thisMonth: 'This Month',
+  referrals: 'Referrals',
+}
+
 // No `to` means a single day (`from` only).
 export function filterCases(cases, { search, from, to, status }) {
   const keyword = search.trim().toLowerCase()
   return cases.filter(
     (item) =>
-      item.studentName.toLowerCase().includes(keyword) &&
-      (!from || (item.date >= from && item.date <= (to || from))) &&
-      (!status || getFollowUpStatus(item.followUpDate) === status),
+      item.learnerName.toLowerCase().includes(keyword) &&
+      (!from || (item.intakeDate >= from && item.intakeDate <= (to || from))) &&
+      (!status || getCaseStatus(item) === status),
   )
 }

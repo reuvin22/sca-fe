@@ -1,7 +1,7 @@
 import { LoaderCircle } from 'lucide-react'
 
 const variants = {
-  primary: 'bg-gray-900 text-white hover:bg-gray-800',
+  primary: 'bg-primary text-white hover:bg-primary-hover',
   outline: 'border border-gray-300 text-gray-700 hover:bg-gray-50',
   danger: 'bg-red-600 text-white hover:bg-red-700',
 }

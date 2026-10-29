@@ -1,0 +1,54 @@
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { ChevronDown, LogOut, UserRound } from 'lucide-react'
+import Dropdown from '../ui/Dropdown'
+import { getShortName } from '../../utils/stringHelpers'
+
+const itemClass = 'flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50'
+
+function ProfileMenu() {
+  const navigate = useNavigate()
+  const user = useSelector((state) => state.auth.user)
+
+  // TODO: clear the session/token here once login is connected to the backend
+  const handleLogout = () => navigate('/login')
+
+  return (
+    <Dropdown
+      label="Account menu"
+      align="left"
+      className="w-48"
+      trigger={
+        <>
+          <span className="flex size-9 items-center justify-center rounded-full bg-brand-600 text-white">
+            <UserRound size={18} />
+          </span>
+          <span className="hidden font-semibold text-gray-900 sm:block">{getShortName(user.fullName)}</span>
+          <ChevronDown size={16} className="hidden text-gray-400 sm:block" />
+        </>
+      }
+    >
+      {(close) => (
+        <>
+          <button
+            type="button"
+            onClick={() => {
+              close()
+              navigate('/profile')
+            }}
+            className={itemClass}
+          >
+            <UserRound size={16} className="text-gray-400" />
+            Profile
+          </button>
+          <button type="button" onClick={handleLogout} className={`${itemClass} text-red-600`}>
+            <LogOut size={16} />
+            Logout
+          </button>
+        </>
+      )}
+    </Dropdown>
+  )
+}
+
+export default ProfileMenu

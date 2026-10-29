@@ -1,8 +1,9 @@
-import { FOLLOW_UP, getFollowUpStatus } from '../../utils/caseHelpers'
+import Badge from '../ui/Badge'
+import { FOLLOW_UP } from '../../utils/caseHelpers'
 
-function FollowUpBadge({ date }) {
-  const { label, className } = FOLLOW_UP[getFollowUpStatus(date)]
-  return <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${className}`}>{label}</span>
+function FollowUpBadge({ status }) {
+  if (!status) return null
+  return <Badge {...FOLLOW_UP[status]} />
 }
 
 export default FollowUpBadge

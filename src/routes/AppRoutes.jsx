@@ -4,6 +4,12 @@ import MainLayout from '../layouts/MainLayout'
 import DashboardPage from '../pages/dashboard/DashboardPage'
 import SettingsPage from '../pages/settings/SettingsPage'
 import CasesPage from '../pages/cases/CasesPage'
+import StudentsPage from '../pages/students/StudentsPage'
+import AppointmentsPage from '../pages/appointments/AppointmentsPage'
+import ReportsPage from '../pages/reports/ReportsPage'
+import FilesPage from '../pages/files/FilesPage'
+import TodoPage from '../pages/todo/TodoPage'
+import ProfilePage from '../pages/profile/ProfilePage'
 import LoginPage from '../pages/auth/LoginPage'
 import RegisterPage from '../pages/auth/RegisterPage'
 import CheckEmailPage from '../pages/auth/CheckEmailPage'
@@ -25,6 +31,12 @@ function AppRoutes() {
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/cases" element={<CasesPage />} />
+        <Route path="/students" element={<StudentsPage />} />
+        <Route path="/appointments" element={<AppointmentsPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/files" element={<FilesPage />} />
+        <Route path="/todo" element={<TodoPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
       {/* Default page */}

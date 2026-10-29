@@ -25,3 +25,9 @@ export async function resetPassword(token, password) {
   await delay()
   if (!token || !password) throw new Error('This reset link is invalid or has expired.')
 }
+
+// `profile`: { user, school }
+export async function updateProfile(profile) {
+  await delay()
+  return profile
+}
