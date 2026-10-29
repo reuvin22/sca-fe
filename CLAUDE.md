@@ -12,6 +12,7 @@ Before building a feature, inspect the existing structure, docs, and code. Do no
 
 ## Code Rules
 - **Do not over code (HARD priority).** Build only what is asked.
+- **All files in `src/` must be `.jsx`** (components, hooks, services, store, utils). Do not create `.js` files. Only root config files (`vite.config.js`, `eslint.config.js`) stay `.js`.
 - Keep files short. **Max 500 lines per file** — split into smaller components/hooks when it grows.
 - Write clean, simple code that an entry level dev can read and follow without Claude.
 - Follow **DRY** — reuse existing components, hooks, services, and helpers.
@@ -27,6 +28,9 @@ Before building a feature, inspect the existing structure, docs, and code. Do no
 - Minimalist design.
 - **All features must be responsive** on every screen size (mobile, tablet, desktop). Use a mobile-first approach with Tailwind breakpoints (`sm`, `md`, `lg`, `xl`).
 - **Always use Tailwind** for styling. No custom CSS unless unavoidable.
+- All buttons and clickable elements must have `cursor-pointer`.
+- Buttons that trigger an API call (create, update, delete, etc.) must show a loading spinner inside the button. Use `<Button loading={...}>`.
+- Deleting always asks for confirmation first (`ConfirmModal`).
 - Use skeleton loaders while data is loading.
 - Optimize images: `loading="lazy"`, set `width`/`height`, use compressed formats (WebP).
 
@@ -36,9 +40,9 @@ Before building a feature, inspect the existing structure, docs, and code. Do no
 
 ## API
 - Keep API code separate from UI:
-  - `src/api/axios.js` — axios instance (base URL, headers, interceptors).
-  - `src/api/routes.js` — endpoint paths.
-  - `src/services/` — one file per feature with the fetch functions (e.g. `userService.js`).
+  - `src/api/axios.jsx` — axios instance (base URL, headers, interceptors).
+  - `src/api/routes.jsx` — endpoint paths.
+  - `src/services/` — one file per feature with the fetch functions (e.g. `userService.jsx`).
 - Pages must not call axios directly. Use a service or a custom hook (e.g. `useUsers`) so pages stay small.
 - Use pagination, filtering, sorting, and search where needed.
 - Show friendly error messages. Never show raw/internal errors to users.
