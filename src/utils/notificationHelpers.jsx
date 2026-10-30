@@ -2,21 +2,24 @@ import { formatDate, formatTime, toDateString } from './dateHelpers'
 
 // Notifications built from GET /reports/notifications. Only names, IDs and dates are shown
 // (never counseling notes or remarks).
+// A system update from the developers, from the list or from a real-time "system-update" event.
+// `read` comes from the server; `updateId` marks it read there.
+export const toUpdateNotification = (item) => ({
+  id: `update-${item.id}`,
+  updateId: item.id,
+  read: item.read,
+  title: `System update: ${item.title}`,
+  message: `${item.reportType === 'bug' ? 'Bug fix' : 'New feature'} · ${formatDate(item.publishedAt.slice(0, 10))}`,
+  to: `/updates/${item.id}`,
+  className: 'bg-brand-500',
+})
+
 // Returns [{ id, title, message, to, className }], most urgent first.
 export function getNotifications({ overdue, dueToday, upcomingAppointments, systemUpdates = [] }) {
   const today = toDateString()
 
   return [
-    // System updates from the developers. `read` comes from the server; `updateId` marks them read there.
-    ...systemUpdates.map((item) => ({
-      id: `update-${item.id}`,
-      updateId: item.id,
-      read: item.read,
-      title: `System update: ${item.title}`,
-      message: `${item.reportType === 'bug' ? 'Bug fix' : 'New feature'} · ${formatDate(item.publishedAt.slice(0, 10))}`,
-      to: `/updates/${item.id}`,
-      className: 'bg-brand-500',
-    })),
+    ...systemUpdates.map(toUpdateNotification),
     ...overdue.map((item) => ({
       id: `overdue-${item.id}`,
       title: 'Follow-up overdue',

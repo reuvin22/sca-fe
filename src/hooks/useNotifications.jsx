@@ -1,14 +1,30 @@
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { subscribeToEvents } from '../api/realtime'
 import { getNotificationData } from '../services/reportService'
 import { markUpdateRead } from '../services/updateService'
-import { getNotifications } from '../utils/notificationHelpers'
+import { getNotifications, toUpdateNotification } from '../utils/notificationHelpers'
 
-// Notification list + read state. Reloads on every page change so edits show up.
+// Notification list + read state. Reloads on every page change so edits show up,
+// and receives new system updates in real time (no refresh needed).
 function useNotifications() {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   const [notifications, setNotifications] = useState([])
   const [readIds, setReadIds] = useState([])
+
+  // Real time: a developer published an update -> add it to the top and show a toast
+  useEffect(
+    () =>
+      subscribeToEvents((event, data) => {
+        if (event !== 'system-update') return
+        const item = toUpdateNotification(data)
+        setNotifications((prev) => [item, ...prev.filter((notification) => notification.id !== item.id)])
+        toast.info(`New system update: ${data.title}`, { onClick: () => navigate(item.to) })
+      }),
+    [navigate],
+  )
 
   useEffect(() => {
     let ignore = false

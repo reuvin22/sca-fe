@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { CircleCheck, CircleX, LoaderCircle, Megaphone, PenLine, RotateCcw } from 'lucide-react'
+import { CheckCheck, CircleCheck, CircleX, LoaderCircle, Megaphone, PenLine, Play, RotateCcw } from 'lucide-react'
 import FeatureCard from '../../components/features/FeatureCard'
 import Alert from '../../components/ui/Alert'
 import Input from '../../components/ui/Input'
@@ -17,28 +17,42 @@ import useRequest from '../../hooks/useRequest'
 import { featureListService } from '../../services/featureService'
 import { getReport, updateReport } from '../../services/supportService'
 import { getTeam } from '../../services/teamService'
-import { REVIEW, REVIEW_PAGE_FILTERS } from '../../utils/reportBoardHelpers'
+import { PROGRESS_FILTERS, REVIEW, REVIEW_PAGE_FILTERS } from '../../utils/reportBoardHelpers'
 
-// Buttons shown for each status: approve / reject, or send a decided request back to review
+// Card buttons. `changes` is what gets saved (review status, or the board status for Mark as Done).
+const APPROVE = { key: 'approve', changes: { review: 'approved' }, label: 'Approve', icon: CircleCheck, className: 'bg-green-600 text-white hover:bg-green-700' }
+const REJECT = { key: 'reject', changes: { review: 'rejected' }, label: 'Reject', icon: CircleX, className: 'bg-red-600 text-white hover:bg-red-700' }
+const BACK_TO_REVIEW = {
+  key: 'back',
+  changes: { review: 'under-review' },
+  label: 'Back to review',
+  icon: RotateCcw,
+  className: 'border border-gray-300 text-gray-700 hover:bg-gray-50',
+}
+// Approved and in the queue: start working on it (In Progress on the board)
+const START = { key: 'start', changes: { status: 'in-progress' }, label: 'Start', icon: Play, className: 'bg-blue-600 text-white hover:bg-blue-700' }
+// Built: moves it to Done, then "Write update & notify users" appears
+const MARK_DONE = { key: 'done', changes: { status: 'done' }, label: 'Mark as Done', icon: CheckCheck, className: 'bg-indigo-600 text-white hover:bg-indigo-700' }
+
+// Buttons shown for each review status (approved ones depend on their progress)
 const ACTIONS = {
-  'under-review': [
-    { review: 'approved', label: 'Approve', icon: CircleCheck, className: 'bg-green-600 text-white hover:bg-green-700' },
-    { review: 'rejected', label: 'Reject', icon: CircleX, className: 'bg-red-600 text-white hover:bg-red-700' },
-  ],
-  approved: [
-    { review: 'rejected', label: 'Reject', icon: CircleX, className: 'bg-red-600 text-white hover:bg-red-700' },
-    { review: 'under-review', label: 'Back to review', icon: RotateCcw, className: 'border border-gray-300 text-gray-700 hover:bg-gray-50' },
-  ],
-  rejected: [
-    { review: 'approved', label: 'Approve', icon: CircleCheck, className: 'bg-green-600 text-white hover:bg-green-700' },
-    { review: 'under-review', label: 'Back to review', icon: RotateCcw, className: 'border border-gray-300 text-gray-700 hover:bg-gray-50' },
-  ],
+  'under-review': [APPROVE, REJECT],
+  rejected: [APPROVE, BACK_TO_REVIEW],
+}
+const APPROVED_ACTIONS = {
+  todo: [START, MARK_DONE, REJECT, BACK_TO_REVIEW],
+  'in-progress': [MARK_DONE, REJECT, BACK_TO_REVIEW],
 }
 
+const TOAST_FOR_STATUS = { 'in-progress': 'in progress', done: 'done. Write the update to notify users' }
+
+const PILL = 'cursor-pointer rounded-md px-3 py-1 text-sm whitespace-nowrap'
+
 // Developers: approve or reject feature requests. Only approved ones can be voted on by users.
-// Clicking a card opens its full details (requester, column, assignee, review, votes).
+// Approved has a second filter for progress (In Queue, In Progress, Done).
+// Clicking a card opens its full details (requester, status, assignee, review, votes).
 function DevFeatureReviewPage() {
-  const [filters, setFilters] = useState({ status: 'under-review', search: '' })
+  const [filters, setFilters] = useState({ status: 'under-review', progress: '', search: '' })
   const list = usePaginatedList(featureListService, null, filters)
   const [saving, setSaving] = useState(null) // "<id>-<review>" while saving
   const team = useFetch(getTeam)
@@ -55,6 +69,7 @@ function DevFeatureReviewPage() {
     toast.success('Update published. Everyone has been notified.')
     setWriting(null)
     list.reload()
+    if (opened) open.run(opened) // the details window now shows "Released · View update"
   }
 
   // Saves a change made in the details window and refreshes the list behind it.
@@ -77,12 +92,13 @@ function DevFeatureReviewPage() {
     return true
   }
 
-  const handleReview = async (feature, review) => {
-    if (review === 'approved') return setApproving(feature) // pick the assignee first
-    setSaving(`${feature.id}-${review}`)
+  const handleAction = async (feature, { key, changes }) => {
+    if (changes.review === 'approved') return setApproving(feature) // pick the assignee first
+    setSaving(`${feature.id}-${key}`)
     try {
-      await updateReport(feature.id, { review })
-      toast.success(`"${feature.subject}" is now ${REVIEW[review].label.toLowerCase()}`)
+      await updateReport(feature.id, changes)
+      const status = changes.status ? TOAST_FOR_STATUS[changes.status] : REVIEW[changes.review].label.toLowerCase()
+      toast.success(`"${feature.subject}" is now ${status}`)
       list.reload()
     } catch (error) {
       toast.error(error.message)
@@ -114,14 +130,16 @@ function DevFeatureReviewPage() {
 
   const actionsFor = (feature) => {
     if (feature.column === 'done') return doneActionsFor(feature)
-    return ACTIONS[feature.review].map(({ review, label, icon: Icon, className }) => {
-      const busy = saving === `${feature.id}-${review}`
+    const actions = feature.review === 'approved' ? APPROVED_ACTIONS[feature.column] ?? [] : ACTIONS[feature.review]
+    return actions.map((action) => {
+      const { key, label, icon: Icon, className } = action
+      const busy = saving === `${feature.id}-${key}`
       return (
         <button
-          key={review}
+          key={key}
           type="button"
           disabled={Boolean(saving)}
-          onClick={() => handleReview(feature, review)}
+          onClick={() => handleAction(feature, action)}
           className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
         >
           {busy ? <LoaderCircle size={16} className="animate-spin" /> : <Icon size={16} />}
@@ -157,14 +175,34 @@ function DevFeatureReviewPage() {
                 type="button"
                 role="tab"
                 aria-selected={filters.status === option.value}
-                onClick={() => setFilters({ ...filters, status: option.value })}
-                className={`flex-1 cursor-pointer rounded-md px-3 py-1 text-sm whitespace-nowrap ${filters.status === option.value ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+                // The progress filter only applies to Approved
+                onClick={() => setFilters({ ...filters, status: option.value, progress: '' })}
+                className={`flex-1 ${PILL} ${filters.status === option.value ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'}`}
               >
                 {option.label}
               </button>
             ))}
           </div>
         </div>
+
+        {/* Second filter under Approved: where the work is (developer board column) */}
+        {filters.status === 'approved' && (
+          <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Filter approved requests by progress">
+            <span className="text-xs font-medium tracking-wide text-gray-500 uppercase">Progress</span>
+            {PROGRESS_FILTERS.map((option) => (
+              <button
+                key={option.value || 'all'}
+                type="button"
+                role="tab"
+                aria-selected={filters.progress === option.value}
+                onClick={() => setFilters({ ...filters, progress: option.value })}
+                className={`${PILL} border ${filters.progress === option.value ? 'border-green-600 bg-green-600 text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         <Alert>{list.error || open.error}</Alert>
         <div className="space-y-3">
@@ -184,7 +222,15 @@ function DevFeatureReviewPage() {
         </div>
       </section>
 
-      {opened && <ReportModal report={opened} team={team.data ?? []} onChange={handleChange} onClose={() => setOpened(null)} />}
+      {opened && (
+        <ReportModal
+          report={opened}
+          team={team.data ?? []}
+          onChange={handleChange}
+          onWriteUpdate={setWriting}
+          onClose={() => setOpened(null)}
+        />
+      )}
 
       {writing && (
         <UpdateEditorModal

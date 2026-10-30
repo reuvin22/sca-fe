@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { toast } from 'react-toastify'
 import ReportColumn from '../../components/dev/ReportColumn'
 import ReportModal from '../../components/dev/ReportModal'
+import UpdateEditorModal from '../../components/dev/UpdateEditorModal'
 import Alert from '../../components/ui/Alert'
 import Skeleton from '../../components/ui/Skeleton'
 import useFetch from '../../hooks/useFetch'
@@ -11,10 +13,18 @@ import { REPORT_COLUMNS, REPORT_TABS } from '../../utils/reportBoardHelpers'
 // Developers: Contact Support messages as a Kanban board, one tab for bugs and one for feature requests
 function DevReportsPage() {
   const [type, setType] = useState('bug')
-  const { reports, loading, error, changeReport, moveReport } = useReportBoard(type)
+  const { reports, loading, error, changeReport, moveReport, markPublished } = useReportBoard(type)
   const team = useFetch(getTeam)
   const [openId, setOpenId] = useState(null)
   const opened = reports.find((report) => report.id === openId)
+  // The done report whose update is being written (publishing notifies every user), or null
+  const [writing, setWriting] = useState(null)
+
+  const handlePublished = (update) => {
+    toast.success('Update published. Everyone has been notified.')
+    markPublished(update.reportId, update.id)
+    setWriting(null)
+  }
 
   return (
     <div className="flex h-[calc(100dvh-6rem)] min-h-120 flex-col gap-6 sm:h-[calc(100dvh-7rem)]">
@@ -55,7 +65,17 @@ function DevReportsPage() {
             ))}
       </section>
 
-      {opened && <ReportModal report={opened} team={team.data ?? []} onChange={changeReport} onClose={() => setOpenId(null)} />}
+      {opened && (
+        <ReportModal
+          report={opened}
+          team={team.data ?? []}
+          onChange={changeReport}
+          onWriteUpdate={setWriting}
+          onClose={() => setOpenId(null)}
+        />
+      )}
+
+      {writing && <UpdateEditorModal task={writing} onPublished={handlePublished} onClose={() => setWriting(null)} />}
     </div>
   )
 }

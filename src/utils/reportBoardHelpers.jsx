@@ -41,15 +41,30 @@ const ALL_FILTER = { value: 'all', label: 'All' }
 // Feature Requests page: All sits beside Rejected
 export const FEATURE_FILTERS = [...REVIEW_OPTIONS, ALL_FILTER]
 
-// Developers' Feature Review page: requests waiting for a decision come first.
-// "Done" = in the Done column of the board (built); write the update that notifies users from there.
+// Developers' Feature Review page: requests waiting for a decision come first
 export const REVIEW_PAGE_FILTERS = [
   { value: 'under-review', label: 'Under Review' },
   { value: 'approved', label: 'Approved' },
   { value: 'rejected', label: 'Rejected' },
-  { value: 'done', label: 'Done' },
   ALL_FILTER,
 ]
+
+// Second filter under Approved: where the work is on the developer board ('' = all approved).
+// Done = built; write the update that notifies users from there.
+export const PROGRESS_FILTERS = [
+  { value: '', label: 'All' },
+  { value: 'todo', label: 'In Queue' },
+  { value: 'in-progress', label: 'In Progress' },
+  { value: 'done', label: 'Done' },
+]
+
+// Progress badge for approved feature requests (Done shows "Released" once the update is published)
+export const PROGRESS = {
+  todo: { label: 'In Queue', className: 'bg-gray-100 text-gray-600' },
+  'in-progress': { label: 'In Progress', className: 'bg-blue-100 text-blue-700' },
+  done: { label: '✓ Done', className: 'bg-indigo-100 text-indigo-700' },
+  released: { label: '✓ Released', className: 'bg-teal-100 text-teal-700' },
+}
 
 export const REPORT_TYPE = {
   bug: { label: 'Bug', className: 'bg-red-100 text-red-700' },

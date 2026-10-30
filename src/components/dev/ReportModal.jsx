@@ -1,4 +1,6 @@
 import { useCallback } from 'react'
+import { Link } from 'react-router-dom'
+import { Megaphone, PenLine } from 'lucide-react'
 import Modal from '../ui/Modal'
 import Badge from '../ui/Badge'
 import Select from '../ui/Select'
@@ -9,9 +11,11 @@ import { getReportAttachmentUrl } from '../../services/supportService'
 import { REPORT_STATUS_OPTIONS, REPORT_TYPE, REVIEW_OPTIONS, SEVERITY } from '../../utils/reportBoardHelpers'
 import { formatDate } from '../../utils/dateHelpers'
 
-// Report details with its images/videos. Changing the column or assignee saves right away.
+// Report details with its images/videos. Changing the status, assignee or review saves right away.
 // `team`: developers that can be assigned. `onChange(id, changes)` saves and returns the updated report.
-function ReportModal({ report, team, onChange, onClose }) {
+// `onWriteUpdate(report)`: when given, a Done report without a published update shows
+// "Write update & notify users" (publishing the update sends everyone a notification).
+function ReportModal({ report, team, onChange, onClose, onWriteUpdate }) {
   const save = useRequest(onChange)
   const loadUrl = useCallback((index) => getReportAttachmentUrl(report.id, index), [report.id])
   const severity = SEVERITY[report.severity]
@@ -34,14 +38,17 @@ function ReportModal({ report, team, onChange, onClose }) {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Select
-            label="Column"
-            id="status"
-            options={REPORT_STATUS_OPTIONS}
-            value={report.status}
-            disabled={save.loading}
-            onChange={(e) => save.run(report.id, { status: e.target.value })}
-          />
+          <div>
+            <Select
+              label="Status"
+              id="status"
+              options={REPORT_STATUS_OPTIONS}
+              value={report.status}
+              disabled={save.loading}
+              onChange={(e) => save.run(report.id, { status: e.target.value })}
+            />
+            <p className="mt-1 text-xs text-gray-500">Set to Done when it's built, then notify users below.</p>
+          </div>
           <Select
             label="Assignee"
             id="assigneeId"
@@ -63,6 +70,32 @@ function ReportModal({ report, team, onChange, onClose }) {
           )}
         </div>
         <Alert>{save.error}</Alert>
+
+        {/* Built: tell everyone with a system update (or open the one already published) */}
+        {report.status === 'done' &&
+          (report.updateId ? (
+            <Link
+              to={`/updates/${report.updateId}`}
+              className="flex w-fit items-center gap-1.5 rounded-lg border border-sky-300 px-3 py-2 text-sm font-medium text-sky-700 hover:bg-sky-50"
+            >
+              <Megaphone size={16} />
+              Released · View update
+            </Link>
+          ) : (
+            onWriteUpdate && (
+              <div className="flex flex-col gap-3 rounded-lg border border-indigo-300 bg-indigo-500/10 p-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-gray-700">Done. Let everyone know what changed.</p>
+                <button
+                  type="button"
+                  onClick={() => onWriteUpdate(report)}
+                  className="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary-hover"
+                >
+                  <PenLine size={16} />
+                  Write update & notify users
+                </button>
+              </div>
+            )
+          ))}
 
         <div>
           <h3 className="mb-1 text-sm font-semibold text-gray-900">Description</h3>

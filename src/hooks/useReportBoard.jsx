@@ -39,7 +39,13 @@ function useReportBoard(type) {
     })
   }
 
-  return { reports: result.reports, loading, error: result.error, changeReport, moveReport }
+  // After its update is published: show "Released" on the card without reloading the board
+  const markPublished = (id, updateId) => {
+    const report = result.reports.find((item) => item.id === id)
+    if (report) replace({ ...report, updateId })
+  }
+
+  return { reports: result.reports, loading, error: result.error, changeReport, moveReport, markPublished }
 }
 
 export default useReportBoard

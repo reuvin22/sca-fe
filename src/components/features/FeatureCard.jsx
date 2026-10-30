@@ -1,6 +1,6 @@
 import { LoaderCircle, ThumbsUp } from 'lucide-react'
 import Badge from '../ui/Badge'
-import { REVIEW } from '../../utils/reportBoardHelpers'
+import { PROGRESS, REVIEW } from '../../utils/reportBoardHelpers'
 import { formatDate } from '../../utils/dateHelpers'
 
 // One feature request: rank (#1 has the most votes among approved), status, votes.
@@ -9,6 +9,8 @@ import { formatDate } from '../../utils/dateHelpers'
 // `onOpen(feature)` makes the whole card clickable (mouse or Enter/Space), e.g. to open details.
 function FeatureCard({ feature, onVote, voting, compact = false, actions, onOpen }) {
   const approved = feature.review === 'approved'
+  const progress =
+    feature.column === 'done' ? PROGRESS[feature.updateId ? 'released' : 'done'] : approved ? PROGRESS[feature.column] : null
   const clickable = onOpen
     ? {
         role: 'button',
@@ -41,13 +43,8 @@ function FeatureCard({ feature, onVote, voting, compact = false, actions, onOpen
         <div className="flex flex-wrap items-center gap-2">
           <h3 className={`font-semibold wrap-break-word text-gray-900 ${compact ? 'text-sm' : ''}`}>{feature.subject}</h3>
           <Badge {...REVIEW[feature.review]} />
-          {/* Built (Done column on the developer board); "Released" once the update was published */}
-          {feature.column === 'done' && (
-            <Badge
-              label={feature.updateId ? '✓ Released' : '✓ Done'}
-              className={feature.updateId ? 'bg-sky-100 text-sky-700' : 'bg-indigo-100 text-indigo-700'}
-            />
-          )}
+          {/* Progress of approved requests (developer board column); "Released" once the update was published */}
+          {progress && <Badge {...progress} />}
           {feature.mine && !compact && <Badge label="Yours" className="bg-brand-50 text-brand-700" />}
         </div>
         {!compact && (
