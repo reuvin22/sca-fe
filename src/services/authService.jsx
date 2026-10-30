@@ -15,6 +15,10 @@ export function login({ email, password }) {
   return startSession(api.post(AUTH_ROUTES.login, { email, password }))
 }
 
+// The backend is on Render's free plan: when it is asleep it needs about 50 s to wake up.
+// Google sign-in waits up to 2 minutes instead of failing with a connection error.
+const GOOGLE_LOGIN_TIMEOUT = 120000
+
 // Google sign-in runs in a Firebase popup. The backend checks the Google ID token.
 export async function loginWithGoogle() {
   let idToken
@@ -26,7 +30,7 @@ export async function loginWithGoogle() {
     if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') return null
     throw new Error('Google sign-in failed. Please try again.', { cause: error })
   }
-  return startSession(api.post(AUTH_ROUTES.google, { idToken }))
+  return startSession(api.post(AUTH_ROUTES.google, { idToken }, { timeout: GOOGLE_LOGIN_TIMEOUT }))
 }
 
 // Clears the saved token and the Google session (if any)
