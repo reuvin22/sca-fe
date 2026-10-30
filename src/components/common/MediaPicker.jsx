@@ -23,7 +23,8 @@ function MediaPicker({ files, onChange, disabled }) {
     const picked = [...e.target.files]
     e.target.value = '' // lets the same file be picked again
     const problems = picked.map(validateMediaFile).filter(Boolean)
-    let next = [...files, ...picked.filter((file) => !validateMediaFile(file))]
+    // Newest picks first, like every other list
+    let next = [...picked.filter((file) => !validateMediaFile(file)), ...files]
 
     if (next.length > MAX_MEDIA_FILES) {
       problems.push(`You can add up to ${MAX_MEDIA_FILES} images or videos.`)
