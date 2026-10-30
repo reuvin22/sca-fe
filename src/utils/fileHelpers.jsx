@@ -24,12 +24,17 @@ export const FILE_KIND_OPTIONS = [
 // For the file picker, e.g. ".pdf,.xls,..."
 export const ACCEPTED_FILES = FILE_KINDS.flatMap((kind) => kind.extensions.map((ext) => `.${ext}`)).join(',')
 
-export const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25 MB
+const MB = 1024 * 1024
+export const MAX_FILE_SIZE = 50 * MB // documents (PDF, Excel, CSV, PowerPoint)
+// Every image upload (Files and profile photo) is limited to 10 MB, same as the backend
+export const MAX_IMAGE_SIZE = 10 * MB
 
 // Error message for a file that can't be uploaded, or '' when it's fine
 export function validateFile(file) {
-  if (getFileKind(file.name) === OTHER) return `${file.name}: file type not allowed.`
-  if (file.size > MAX_FILE_SIZE) return `${file.name}: larger than 25 MB.`
+  const kind = getFileKind(file.name)
+  if (kind === OTHER) return `${file.name}: file type not allowed.`
+  if (kind.label === 'Image' && file.size > MAX_IMAGE_SIZE) return `${file.name}: images must be 10 MB or smaller.`
+  if (file.size > MAX_FILE_SIZE) return `${file.name}: documents must be 50 MB or smaller.`
   return ''
 }
 

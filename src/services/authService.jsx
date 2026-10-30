@@ -69,7 +69,7 @@ export async function updateProfile(profile) {
   return (await api.put(PROFILE_ROUTE, profile)).data
 }
 
-// `file`: an image File (PNG, JPG or WEBP, max 2 MB). Returns the updated profile.
+// `file`: an image File (PNG, JPG or WEBP, max 10 MB). Returns the updated profile.
 export async function uploadProfilePhoto(file) {
   const form = new FormData()
   form.append('photo', file)

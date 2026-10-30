@@ -9,14 +9,15 @@ import Avatar from '../common/Avatar'
 import useRequest from '../../hooks/useRequest'
 import { deleteProfilePhoto, uploadProfilePhoto } from '../../services/authService'
 import { setProfile } from '../../store/authSlice'
+import { MAX_IMAGE_SIZE } from '../../utils/fileHelpers'
 
 const PHOTO_TYPES = ['image/png', 'image/jpeg', 'image/webp']
-const PHOTO_MAX_SIZE = 2 * 1024 * 1024 // 2 MB, same as the backend
+const PHOTO_MAX_SIZE = MAX_IMAGE_SIZE // 10 MB, same as the backend
 
 // Error message for a photo that can't be uploaded, or '' when it's fine
 function validatePhoto(file) {
   if (!PHOTO_TYPES.includes(file.type)) return 'Please choose a PNG, JPG or WEBP image.'
-  if (file.size > PHOTO_MAX_SIZE) return 'The photo must be 2 MB or smaller.'
+  if (file.size > PHOTO_MAX_SIZE) return 'The photo must be 10 MB or smaller.'
   return ''
 }
 

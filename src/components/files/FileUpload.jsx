@@ -32,7 +32,7 @@ function FileUpload({ onUpload, uploading }) {
       <Upload size={28} className="text-gray-400" />
       <div>
         <p className="text-sm font-medium text-gray-700">Drag and drop files here</p>
-        <p className="text-xs text-gray-400">PDF, Excel, CSV, PowerPoint, PNG or JPG · up to 25 MB each</p>
+        <p className="text-xs text-gray-400">PDF, Excel, CSV or PowerPoint up to 50 MB · PNG or JPG up to 10 MB</p>
       </div>
       <input ref={inputRef} type="file" accept={ACCEPTED_FILES} multiple hidden onChange={handleSelect} />
       <Button fullWidth={false} loading={uploading} onClick={() => inputRef.current.click()}>
