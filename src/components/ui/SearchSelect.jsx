@@ -1,6 +1,6 @@
 import { useId, useState } from 'react'
 import { ChevronDown, LoaderCircle, Plus } from 'lucide-react'
-import { fieldClass } from '../../utils/styles'
+import { FIELD_TEXT, FIELD_TEXT_PLACEHOLDER, fieldClass } from '../../utils/styles'
 
 // Dropdown you can type in to search. `options`: list of strings.
 // `onChange` gets an input-like event ({ target: { name, value } }) so it works with useForm.
@@ -76,6 +76,7 @@ function SearchSelect({
 
   // Free text with no matching suggestions: nothing to show
   const showList = open && !(freeText && choices.length === 0)
+  const showValueAsPlaceholder = !freeText && open && Boolean(value)
 
   return (
     <div className="space-y-1">
@@ -94,10 +95,11 @@ function SearchSelect({
           aria-controls={listId}
           aria-autocomplete="list"
           autoComplete="off"
-          className={`pr-9 ${fieldClass(error)}`}
-          // While open the box is for searching; the current value shows as the placeholder
+          // While open the box is for searching; the current value shows as the placeholder,
+          // in the same black/white as normal text so it stays readable
+          className={`pr-9 ${fieldClass(error)} ${showValueAsPlaceholder ? FIELD_TEXT_PLACEHOLDER : ''}`}
           value={freeText || !open ? value : query}
-          placeholder={(!freeText && open && value) || placeholder}
+          placeholder={showValueAsPlaceholder ? value : placeholder}
           disabled={disabled || creating}
           onFocus={() => {
             setOpen(true)
@@ -131,7 +133,7 @@ function SearchSelect({
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => choose(choice)}
                   onMouseEnter={() => setActive(i)}
-                  className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm ${i === active ? 'bg-gray-100' : ''} ${choice.create ? 'font-medium text-brand-600' : 'text-gray-900'} ${selected ? 'font-semibold' : ''}`}
+                  className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm ${FIELD_TEXT} ${i === active ? 'bg-gray-100' : ''} ${choice.create || selected ? 'font-semibold' : ''}`}
                 >
                   {choice.create && <Plus size={14} />}
                   {choice.label}
