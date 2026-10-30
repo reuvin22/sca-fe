@@ -21,6 +21,7 @@ export const CATEGORIES_ROUTE = '/categories'
 export const FILES_ROUTE = '/files'
 export const TODO_BOARD_ROUTE = '/todo/board'
 export const SUPPORT_ROUTE = '/support'
+export const FEATURES_ROUTE = '/features'
 export const TEAM_ROUTE = '/team'
 export const UPDATES_ROUTE = '/updates'
 

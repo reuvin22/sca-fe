@@ -1,6 +1,6 @@
-import { Paperclip, UserRound } from 'lucide-react'
+import { Paperclip, ThumbsUp, UserRound } from 'lucide-react'
 import Badge from '../ui/Badge'
-import { SEVERITY } from '../../utils/reportBoardHelpers'
+import { REVIEW, SEVERITY } from '../../utils/reportBoardHelpers'
 import { formatDate } from '../../utils/dateHelpers'
 import { getInitials } from '../../utils/stringHelpers'
 
@@ -23,6 +23,15 @@ function ReportCard({ report, onOpen }) {
 
       <div className="mt-3 flex items-center gap-2">
         {severity && <Badge label={severity.label} className={severity.className} />}
+        {report.type === 'feature' && (
+          <>
+            <Badge {...REVIEW[report.review ?? 'under-review']} />
+            <span className="flex items-center gap-0.5 text-xs text-gray-500" title="Votes">
+              <ThumbsUp size={12} />
+              {report.votes ?? 0}
+            </span>
+          </>
+        )}
         {report.attachments.length > 0 && (
           <span className="flex items-center gap-0.5 text-xs text-gray-500" title="Images or videos attached">
             <Paperclip size={12} />

@@ -7,6 +7,7 @@ import RequireRole from '../components/common/RequireRole'
 import Skeleton from '../components/ui/Skeleton'
 import DevRegisterPage from '../pages/auth/DevRegisterPage'
 import UpdateDetailPage from '../pages/updates/UpdateDetailPage'
+import FeatureRequestsPage from '../pages/features/FeatureRequestsPage'
 
 // Developer pages load only when a developer opens them (the editor is large)
 const DevReportsPage = lazy(() => import('../pages/dev/DevReportsPage'))
@@ -60,6 +61,8 @@ function AppRoutes() {
         <Route path="/settings" element={<SettingsPage />} />
         {/* Opened from a notification; not in the menu */}
         <Route path="/updates/:id" element={<UpdateDetailPage />} />
+        {/* Opened from the navbar, beside Contact Support */}
+        <Route path="/feature-requests" element={<FeatureRequestsPage />} />
 
         {/* Developers only (the backend checks the role too) */}
         <Route

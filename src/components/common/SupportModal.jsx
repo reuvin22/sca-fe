@@ -32,8 +32,9 @@ const HINTS = {
 
 // Bug report / feature request form. Bugs can include images and videos.
 // Shows a thank-you message after sending.
-function SupportModal({ onClose }) {
-  const { form, errors, setErrors, handleChange } = useForm({ type: 'bug', severity: 'medium', subject: '', description: '' })
+// `initialType` picks the starting type ('bug' | 'feature'). `onSent` runs after a request is sent.
+function SupportModal({ onClose, initialType = 'bug', onSent }) {
+  const { form, errors, setErrors, handleChange } = useForm({ type: initialType, severity: 'medium', subject: '', description: '' })
   const send = useRequest(sendSupportRequest)
   const [sent, setSent] = useState(false)
   // Screenshots / screen recordings, bug reports only
@@ -46,7 +47,10 @@ function SupportModal({ onClose }) {
     if (Object.keys(newErrors).length) return
     const request = { type: form.type, subject: form.subject.trim(), description: form.description.trim() }
     if (form.type === 'bug') request.severity = form.severity
-    if (await send.run(request, form.type === 'bug' ? files : [])) setSent(true)
+    if (await send.run(request, form.type === 'bug' ? files : [])) {
+      setSent(true)
+      onSent?.()
+    }
   }
 
   if (sent) {

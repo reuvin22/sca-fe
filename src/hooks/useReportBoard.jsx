@@ -24,7 +24,7 @@ function useReportBoard(type) {
   const changeReport = async (id, changes) => {
     const updated = await updateReport(id, changes)
     replace(updated)
-    toast.success(changes.status ? 'Report moved' : 'Report assigned')
+    toast.success(changes.status ? 'Report moved' : changes.review ? 'Review updated' : 'Report assigned')
     return updated
   }
 

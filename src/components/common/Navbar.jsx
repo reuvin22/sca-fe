@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Menu, Mail, LifeBuoy } from 'lucide-react'
+import { NavLink } from 'react-router-dom'
+import { Menu, Mail, LifeBuoy, Lightbulb } from 'lucide-react'
 import ProfileMenu from './ProfileMenu'
 import ThemeMenu from './ThemeMenu'
 import SupportModal from './SupportModal'
@@ -28,6 +29,14 @@ function Navbar() {
             <LifeBuoy size={20} />
             <span className="hidden text-sm font-medium lg:inline">Contact Support</span>
           </button>
+          <NavLink
+            to="/feature-requests"
+            aria-label="Feature Requests"
+            className={({ isActive }) => `flex items-center gap-1.5 ${iconButton} ${isActive ? 'bg-gray-100 text-gray-900' : ''}`}
+          >
+            <Lightbulb size={20} />
+            <span className="hidden text-sm font-medium lg:inline">Feature Requests</span>
+          </NavLink>
           <ThemeMenu />
           <NotificationMenu />
           <button className={iconButton} aria-label="Messages">

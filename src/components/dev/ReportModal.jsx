@@ -6,7 +6,7 @@ import Alert from '../ui/Alert'
 import MediaGallery from '../common/MediaGallery'
 import useRequest from '../../hooks/useRequest'
 import { getReportAttachmentUrl } from '../../services/supportService'
-import { REPORT_STATUS_OPTIONS, REPORT_TYPE, SEVERITY } from '../../utils/reportBoardHelpers'
+import { REPORT_STATUS_OPTIONS, REPORT_TYPE, REVIEW_OPTIONS, SEVERITY } from '../../utils/reportBoardHelpers'
 import { formatDate } from '../../utils/dateHelpers'
 
 // Report details with its images/videos. Changing the column or assignee saves right away.
@@ -50,6 +50,17 @@ function ReportModal({ report, team, onChange, onClose }) {
             disabled={save.loading}
             onChange={(e) => save.run(report.id, { assigneeId: e.target.value || null })}
           />
+          {/* Feature requests: only approved ones appear for voting on the Feature Requests page */}
+          {report.type === 'feature' && (
+            <Select
+              label={`Review · ${report.votes ?? 0} vote${report.votes === 1 ? '' : 's'}`}
+              id="review"
+              options={REVIEW_OPTIONS}
+              value={report.review ?? 'under-review'}
+              disabled={save.loading}
+              onChange={(e) => save.run(report.id, { review: e.target.value })}
+            />
+          )}
         </div>
         <Alert>{save.error}</Alert>
 
