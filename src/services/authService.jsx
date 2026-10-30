@@ -87,3 +87,14 @@ export async function getProfilePhotoUrl() {
 export async function deleteProfilePhoto() {
   return (await api.delete(PROFILE_PHOTO_ROUTE)).data
 }
+
+// Developer invitation: { email } of the invited person (doesn't use the invitation up)
+export async function getInvitation(token) {
+  if (!token) throw new Error('This invitation link is invalid or has expired.')
+  return (await api.get(AUTH_ROUTES.invitation(token))).data
+}
+
+// Creates the developer account from the invitation and signs in. Returns { token, profile }.
+export function registerDeveloper({ token, fullName, password }) {
+  return startSession(api.post(AUTH_ROUTES.registerDeveloper, { token, fullName, password }))
+}

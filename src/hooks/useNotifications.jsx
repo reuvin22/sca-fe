@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getNotificationData } from '../services/reportService'
+import { markUpdateRead } from '../services/updateService'
 import { getNotifications } from '../utils/notificationHelpers'
 
 // Notification list + read state. Reloads on every page change so edits show up.
@@ -19,14 +20,21 @@ function useNotifications() {
     }
   }, [pathname])
 
-  const isRead = (id) => readIds.includes(id)
+  // System updates remember "read" on the server; the others only until the page reloads
+  const isRead = (id) => readIds.includes(id) || notifications.some((item) => item.id === id && item.read)
+
+  const markRead = (id) => {
+    const item = notifications.find((notification) => notification.id === id)
+    if (item?.updateId && !item.read) markUpdateRead(item.updateId).catch(() => {})
+    setReadIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+  }
 
   return {
     notifications,
     unreadCount: notifications.filter((item) => !isRead(item.id)).length,
     isRead,
-    markRead: (id) => setReadIds((prev) => (prev.includes(id) ? prev : [...prev, id])),
-    markAllRead: () => setReadIds(notifications.map((item) => item.id)),
+    markRead,
+    markAllRead: () => notifications.forEach((item) => markRead(item.id)),
   }
 }
 

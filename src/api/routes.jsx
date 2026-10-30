@@ -8,6 +8,8 @@ export const AUTH_ROUTES = {
   verifyEmail: '/auth/verify-email',
   forgotPassword: '/auth/forgot-password',
   resetPassword: '/auth/reset-password',
+  invitation: (token) => `/auth/invitations/${token}`,
+  registerDeveloper: '/auth/register-developer',
 }
 
 export const PROFILE_ROUTE = '/profile'
@@ -19,6 +21,8 @@ export const CATEGORIES_ROUTE = '/categories'
 export const FILES_ROUTE = '/files'
 export const TODO_BOARD_ROUTE = '/todo/board'
 export const SUPPORT_ROUTE = '/support'
+export const TEAM_ROUTE = '/team'
+export const UPDATES_ROUTE = '/updates'
 
 export const REPORT_ROUTES = {
   dashboard: '/reports/dashboard',

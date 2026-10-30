@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CircleCheck } from 'lucide-react'
 import FormModal from './FormModal'
+import MediaPicker from './MediaPicker'
 import Modal from '../ui/Modal'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
@@ -29,11 +30,14 @@ const HINTS = {
   feature: 'What you would like added and how it would help your work.',
 }
 
-// Bug report / feature request form. Shows a thank-you message after sending.
+// Bug report / feature request form. Bugs can include images and videos.
+// Shows a thank-you message after sending.
 function SupportModal({ onClose }) {
   const { form, errors, setErrors, handleChange } = useForm({ type: 'bug', severity: 'medium', subject: '', description: '' })
   const send = useRequest(sendSupportRequest)
   const [sent, setSent] = useState(false)
+  // Screenshots / screen recordings, bug reports only
+  const [files, setFiles] = useState([])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -42,7 +46,7 @@ function SupportModal({ onClose }) {
     if (Object.keys(newErrors).length) return
     const request = { type: form.type, subject: form.subject.trim(), description: form.description.trim() }
     if (form.type === 'bug') request.severity = form.severity
-    if (await send.run(request)) setSent(true)
+    if (await send.run(request, form.type === 'bug' ? files : [])) setSent(true)
   }
 
   if (sent) {
@@ -82,6 +86,7 @@ function SupportModal({ onClose }) {
         onChange={handleChange}
         error={errors.description}
       />
+      {form.type === 'bug' && <MediaPicker files={files} onChange={setFiles} disabled={send.loading} />}
     </FormModal>
   )
 }
