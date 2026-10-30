@@ -10,7 +10,7 @@ import Pagination from '../../components/ui/Pagination'
 import Skeleton from '../../components/ui/Skeleton'
 import usePaginatedList from '../../hooks/usePaginatedList'
 import { featureListService, myFeatureService, toggleFeatureVote } from '../../services/featureService'
-import { REVIEW_OPTIONS } from '../../utils/reportBoardHelpers'
+import { FEATURE_FILTERS } from '../../utils/reportBoardHelpers'
 
 const NO_FILTERS = {}
 
@@ -18,10 +18,10 @@ function ListSkeleton() {
   return Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-24 rounded-lg" />)
 }
 
-// Every feature request (left, most votes first, with search and a status filter)
+// Every feature request (left, most votes first, with search and a status filter; "All" leaves out rejected)
 // and the user's own requests (right, 30%). Users vote on approved requests to set priorities.
 function FeatureRequestsPage() {
-  const [filters, setFilters] = useState({ status: 'approved', search: '' })
+  const [filters, setFilters] = useState({ status: 'all', search: '' })
   const all = usePaginatedList(featureListService, null, filters)
   const mine = usePaginatedList(myFeatureService, null, NO_FILTERS)
   const [votingId, setVotingId] = useState(null)
@@ -75,7 +75,7 @@ function FeatureRequestsPage() {
               />
             </div>
             <div className="flex rounded-lg border border-gray-200 p-1" role="tablist" aria-label="Filter by status">
-              {REVIEW_OPTIONS.map((option) => (
+              {FEATURE_FILTERS.map((option) => (
                 <button
                   key={option.value}
                   type="button"

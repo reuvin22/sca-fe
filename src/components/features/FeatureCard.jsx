@@ -9,7 +9,8 @@ function FeatureCard({ feature, onVote, voting, compact = false }) {
   const approved = feature.review === 'approved'
 
   return (
-    <article className={`flex gap-3 rounded-lg border border-gray-200 bg-surface ${compact ? 'p-3' : 'p-4'}`}>
+    // Card color follows the status: green approved, orange under review, red rejected
+    <article className={`flex gap-3 rounded-lg border border-l-4 ${REVIEW[feature.review].card} ${compact ? 'p-3' : 'p-4'}`}>
       {/* Rank (approved) or a dash (not ranked yet) */}
       <div
         className={`flex shrink-0 items-center justify-center rounded-lg font-bold ${compact ? 'size-9 text-sm' : 'size-11 text-base'} ${approved ? 'bg-brand-50 text-brand-700' : 'bg-gray-100 text-gray-400'}`}
