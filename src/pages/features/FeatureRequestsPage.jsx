@@ -21,7 +21,8 @@ function ListSkeleton() {
 // Every feature request (left, most votes first, with search and a status filter; "All" leaves out rejected)
 // and the user's own requests (right, 30%). Users vote on approved requests to set priorities.
 function FeatureRequestsPage() {
-  const [filters, setFilters] = useState({ status: 'all', search: '' })
+  // Opens on Approved: the requests users can vote on
+  const [filters, setFilters] = useState({ status: 'approved', search: '' })
   const all = usePaginatedList(featureListService, null, filters)
   const mine = usePaginatedList(myFeatureService, null, NO_FILTERS)
   const [votingId, setVotingId] = useState(null)

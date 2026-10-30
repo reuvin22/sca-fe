@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { CircleCheck, CircleX, LoaderCircle, RotateCcw } from 'lucide-react'
+import { CircleCheck, CircleX, LoaderCircle, Megaphone, PenLine, RotateCcw } from 'lucide-react'
 import FeatureCard from '../../components/features/FeatureCard'
 import Alert from '../../components/ui/Alert'
 import Input from '../../components/ui/Input'
@@ -10,6 +11,7 @@ import Skeleton from '../../components/ui/Skeleton'
 import usePaginatedList from '../../hooks/usePaginatedList'
 import ReportModal from '../../components/dev/ReportModal'
 import ApproveFeatureModal from '../../components/dev/ApproveFeatureModal'
+import UpdateEditorModal from '../../components/dev/UpdateEditorModal'
 import useFetch from '../../hooks/useFetch'
 import useRequest from '../../hooks/useRequest'
 import { featureListService } from '../../services/featureService'
@@ -46,6 +48,14 @@ function DevFeatureReviewPage() {
   const currentUserId = useSelector((state) => state.auth.user?.id)
   // The feature being approved (the Approve & assign window), or null
   const [approving, setApproving] = useState(null)
+  // The done feature whose update is being written (publishing notifies every user), or null
+  const [writing, setWriting] = useState(null)
+
+  const handlePublished = () => {
+    toast.success('Update published. Everyone has been notified.')
+    setWriting(null)
+    list.reload()
+  }
 
   // Saves a change made in the details window and refreshes the list behind it.
   // Approving an unassigned request assigns it to the developer viewing it.
@@ -81,8 +91,30 @@ function DevFeatureReviewPage() {
     }
   }
 
-  const actionsFor = (feature) =>
-    ACTIONS[feature.review].map(({ review, label, icon: Icon, className }) => {
+  // Done (built) requests: write the update that notifies everyone, or open it once published
+  const doneActionsFor = (feature) =>
+    feature.updateId ? (
+      <Link
+        to={`/updates/${feature.updateId}`}
+        className="flex items-center gap-1.5 rounded-lg border border-sky-300 px-3 py-1.5 text-sm font-medium text-sky-700 hover:bg-sky-50"
+      >
+        <Megaphone size={16} />
+        Released · View update
+      </Link>
+    ) : (
+      <button
+        type="button"
+        onClick={() => setWriting(feature)}
+        className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-hover"
+      >
+        <PenLine size={16} />
+        Write update & notify users
+      </button>
+    )
+
+  const actionsFor = (feature) => {
+    if (feature.column === 'done') return doneActionsFor(feature)
+    return ACTIONS[feature.review].map(({ review, label, icon: Icon, className }) => {
       const busy = saving === `${feature.id}-${review}`
       return (
         <button
@@ -97,6 +129,7 @@ function DevFeatureReviewPage() {
         </button>
       )
     })
+  }
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -152,6 +185,14 @@ function DevFeatureReviewPage() {
       </section>
 
       {opened && <ReportModal report={opened} team={team.data ?? []} onChange={handleChange} onClose={() => setOpened(null)} />}
+
+      {writing && (
+        <UpdateEditorModal
+          task={{ id: writing.id, type: 'feature', subject: writing.subject }}
+          onPublished={handlePublished}
+          onClose={() => setWriting(null)}
+        />
+      )}
 
       {approving && (
         <ApproveFeatureModal

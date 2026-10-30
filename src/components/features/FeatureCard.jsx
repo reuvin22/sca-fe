@@ -41,6 +41,13 @@ function FeatureCard({ feature, onVote, voting, compact = false, actions, onOpen
         <div className="flex flex-wrap items-center gap-2">
           <h3 className={`font-semibold wrap-break-word text-gray-900 ${compact ? 'text-sm' : ''}`}>{feature.subject}</h3>
           <Badge {...REVIEW[feature.review]} />
+          {/* Built (Done column on the developer board); "Released" once the update was published */}
+          {feature.column === 'done' && (
+            <Badge
+              label={feature.updateId ? '✓ Released' : '✓ Done'}
+              className={feature.updateId ? 'bg-sky-100 text-sky-700' : 'bg-indigo-100 text-indigo-700'}
+            />
+          )}
           {feature.mine && !compact && <Badge label="Yours" className="bg-brand-50 text-brand-700" />}
         </div>
         {!compact && (

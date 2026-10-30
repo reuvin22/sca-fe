@@ -41,11 +41,13 @@ const ALL_FILTER = { value: 'all', label: 'All' }
 // Feature Requests page: All sits beside Rejected
 export const FEATURE_FILTERS = [...REVIEW_OPTIONS, ALL_FILTER]
 
-// Developers' Feature Review page: requests waiting for a decision come first
+// Developers' Feature Review page: requests waiting for a decision come first.
+// "Done" = in the Done column of the board (built); write the update that notifies users from there.
 export const REVIEW_PAGE_FILTERS = [
   { value: 'under-review', label: 'Under Review' },
   { value: 'approved', label: 'Approved' },
   { value: 'rejected', label: 'Rejected' },
+  { value: 'done', label: 'Done' },
   ALL_FILTER,
 ]
 
