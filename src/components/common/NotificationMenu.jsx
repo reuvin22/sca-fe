@@ -6,7 +6,8 @@ import useNotifications from '../../hooks/useNotifications'
 // Bell with unread count. Clicking a notification marks it read and opens its page.
 function NotificationMenu() {
   const navigate = useNavigate()
-  const { notifications, unreadCount, isRead, markRead, markAllRead } = useNotifications()
+  // Only unread notifications are listed; reading one removes it
+  const { notifications, unreadCount, markRead, markAllRead } = useNotifications()
 
   const trigger = (
     <span className="relative">
@@ -45,9 +46,9 @@ function NotificationMenu() {
                       close()
                       navigate(item.to)
                     }}
-                    className={`flex w-full cursor-pointer gap-3 px-3 py-2.5 text-left hover:bg-gray-50 ${isRead(item.id) ? 'opacity-60' : ''}`}
+                    className="flex w-full cursor-pointer gap-3 px-3 py-2.5 text-left hover:bg-gray-50"
                   >
-                    <span className={`mt-1.5 size-2 shrink-0 rounded-full ${isRead(item.id) ? 'bg-gray-300' : item.className}`} />
+                    <span className={`mt-1.5 size-2 shrink-0 rounded-full ${item.className}`} />
                     <span className="min-w-0">
                       <span className="block text-sm font-medium text-gray-900">{item.title}</span>
                       <span className="block truncate text-xs text-gray-500">{item.message}</span>
