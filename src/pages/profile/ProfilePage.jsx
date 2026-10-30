@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { Pencil } from 'lucide-react'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import ProfileForm from '../../components/profile/ProfileForm'
+import useProfileComplete from '../../hooks/useProfileComplete'
 import { COUNSELOR_FIELD, PERSONAL_FIELDS, SCHOOL_FIELDS } from '../../utils/profileHelpers'
 import { getInitials } from '../../utils/stringHelpers'
 
@@ -26,7 +28,17 @@ function DetailsCard({ title, fields, data }) {
 function ProfilePage() {
   const user = useSelector((state) => state.auth.user)
   const school = useSelector((state) => state.auth.school)
+  const navigate = useNavigate()
+  // First sign-in: the form stays open until the required details are saved
+  const mustComplete = !useProfileComplete()
   const [editing, setEditing] = useState(false)
+  const showForm = editing || mustComplete
+
+  // After completing the profile for the first time, open the system
+  const handleDone = () => {
+    setEditing(false)
+    if (mustComplete) navigate('/dashboard', { replace: true })
+  }
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -35,7 +47,7 @@ function ProfilePage() {
           <h1 className="text-2xl font-semibold text-gray-900">Profile</h1>
           <p className="text-sm text-gray-500">Your account and school information.</p>
         </div>
-        {!editing && (
+        {!showForm && (
           <Button fullWidth={false} onClick={() => setEditing(true)}>
             <Pencil size={16} />
             Edit Profile
@@ -57,8 +69,15 @@ function ProfilePage() {
         </div>
       </Card>
 
-      {editing ? (
-        <ProfileForm onDone={() => setEditing(false)} />
+      {mustComplete && (
+        <p className="rounded-lg bg-brand-50 px-4 py-3 text-sm text-brand-700">
+          Welcome! Please complete your profile and school details to start using the system. Fields marked * are
+          required.
+        </p>
+      )}
+
+      {showForm ? (
+        <ProfileForm onDone={handleDone} mustComplete={mustComplete} />
       ) : (
         <>
           <DetailsCard title="Personal Details" fields={PERSONAL_FIELDS} data={user} />

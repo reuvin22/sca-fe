@@ -6,8 +6,8 @@ function MainLayout() {
   return (
     <div className="flex min-h-screen bg-page">
       <Sidebar />
-      {/* pl-16 leaves room for the fixed collapsed sidebar on mobile */}
-      <div className="min-w-0 flex-1 pl-16 md:pl-0">
+      {/* On small screens the sidebar is hidden (opened with the burger menu), so the page uses the full width */}
+      <div className="min-w-0 flex-1">
         <Navbar />
         <main className="p-4 sm:p-6">
           <Outlet />

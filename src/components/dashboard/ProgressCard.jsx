@@ -5,14 +5,14 @@ import ProgressRing from '../ui/ProgressRing'
 function ProgressCard({ items, title = 'Case Overview' }) {
   return (
     <Card title={title} icon={Menu}>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         {items.map((item) => (
-          <div key={item.label} className="flex flex-col items-center text-center">
+          <div key={item.label} className="flex min-w-0 flex-col items-center text-center">
             <ProgressRing value={item.value} color={item.color} size={90}>
-              <span className="text-2xl font-bold text-gray-800">{item.value}%</span>
+              <span className="text-lg font-bold text-gray-800 sm:text-2xl">{item.value}%</span>
             </ProgressRing>
-            <p className="mt-3 text-sm font-semibold text-gray-800 uppercase">{item.label}</p>
-            <p className="text-xs text-gray-400">{item.note}</p>
+            <p className="mt-3 text-xs font-semibold break-words text-gray-800 uppercase sm:text-sm">{item.label}</p>
+            <p className="text-xs leading-tight text-gray-500">{item.note}</p>
           </div>
         ))}
       </div>

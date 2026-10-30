@@ -9,12 +9,18 @@ import useForm from '../../hooks/useForm'
 import useRequest from '../../hooks/useRequest'
 import { setProfile } from '../../store/authSlice'
 import { updateProfile } from '../../services/authService'
-import { COUNSELOR_FIELD, PERSONAL_FIELDS, SCHOOL_FIELDS, pickFields } from '../../utils/profileHelpers'
+import {
+  COUNSELOR_FIELD,
+  PERSONAL_FIELDS,
+  REQUIRED_PROFILE_FIELDS,
+  SCHOOL_FIELDS,
+  pickFields,
+} from '../../utils/profileHelpers'
 import { validateProfile } from '../../utils/validators'
 
 // Personal and school details as editable fields, saved together.
-// `onDone` is called after saving or cancelling.
-function ProfileForm({ onDone }) {
+// `onDone` is called after saving or cancelling. `mustComplete` hides Cancel (first sign-in).
+function ProfileForm({ onDone, mustComplete = false }) {
   const dispatch = useDispatch()
   const { user, school } = useSelector((state) => state.auth)
   const initial = { ...user, ...school } // field ids don't overlap
@@ -25,7 +31,7 @@ function ProfileForm({ onDone }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const newErrors = validateProfile(form)
+    const newErrors = validateProfile(form, REQUIRED_PROFILE_FIELDS)
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
 
@@ -37,9 +43,19 @@ function ProfileForm({ onDone }) {
     }
   }
 
+  // Required fields get a * (the plain label still picks the matching Settings dropdown)
   const renderFields = (fields) =>
-    fields.map(({ id, label, type }) => (
-      <FormField key={id} label={label} id={id} type={type} value={form[id]} onChange={handleChange} error={errors[id]} />
+    fields.map(({ id, label, type, required }) => (
+      <FormField
+        key={id}
+        label={required ? `${label} *` : label}
+        category={label}
+        id={id}
+        type={type}
+        value={form[id]}
+        onChange={handleChange}
+        error={errors[id]}
+      />
     ))
 
   return (
@@ -59,9 +75,11 @@ function ProfileForm({ onDone }) {
       <Alert>{save.error}</Alert>
 
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" fullWidth={false} disabled={save.loading} onClick={onDone}>
-          Cancel
-        </Button>
+        {!mustComplete && (
+          <Button type="button" variant="outline" fullWidth={false} disabled={save.loading} onClick={onDone}>
+            Cancel
+          </Button>
+        )}
         <Button type="submit" fullWidth={false} loading={save.loading} disabled={!changed}>
           Save Changes
         </Button>

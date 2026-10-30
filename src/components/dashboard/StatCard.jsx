@@ -1,12 +1,13 @@
+// Small screens: icon above the text so the label has room to wrap (no cut-off text)
 function StatCard({ label, value, icon: Icon }) {
   return (
-    <div className="flex items-center gap-4 rounded-xl bg-surface p-5 text-gray-900 shadow-sm">
-      <span className="shrink-0 rounded-lg bg-gray-100 p-2.5 text-gray-600">
-        <Icon size={22} />
+    <div className="flex flex-col gap-3 rounded-xl bg-surface p-4 text-gray-900 shadow-sm sm:flex-row sm:items-center sm:gap-4 sm:p-5">
+      <span className="w-fit shrink-0 rounded-lg bg-gray-100 p-2 text-gray-600 sm:p-2.5">
+        <Icon size={20} />
       </span>
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium tracking-wide text-gray-500 uppercase" title={label}>{label}</p>
-        <p className="text-3xl font-bold">{value}</p>
+        <p className="text-xs leading-tight font-medium tracking-wide break-words text-gray-500 uppercase sm:text-sm">{label}</p>
+        <p className="mt-1 text-2xl font-bold sm:text-3xl">{value}</p>
       </div>
     </div>
   )

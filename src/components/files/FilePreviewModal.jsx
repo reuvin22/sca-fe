@@ -1,11 +1,30 @@
-import { Download, FileQuestion } from 'lucide-react'
+import { Download, FileQuestion, LoaderCircle } from 'lucide-react'
 import Modal from '../ui/Modal'
+import Skeleton from '../ui/Skeleton'
 import SheetPreview from './SheetPreview'
 import { formatSize, getFileKind } from '../../utils/fileHelpers'
 
 // Shows images, PDFs, CSV and Excel (.xlsx). Other types can only be downloaded.
+// `file.url` is empty while the file is still downloading.
 function FilePreviewModal({ file, onClose }) {
   const kind = getFileKind(file.name).label
+
+  if (!file.url) {
+    return (
+      <Modal title={file.name} onClose={onClose} className="max-w-4xl">
+        <Skeleton className="h-[50vh]" />
+        <div className="mt-4 flex items-center justify-between gap-2 text-sm text-gray-500">
+          <span>
+            {kind} · {formatSize(file.size)}
+          </span>
+          <span className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-white opacity-60">
+            <LoaderCircle size={16} className="animate-spin" />
+            Loading...
+          </span>
+        </div>
+      </Modal>
+    )
+  }
 
   const preview = {
     Image: <img src={file.url} alt={file.name} loading="lazy" className="mx-auto max-h-[70vh] w-auto object-contain" />,

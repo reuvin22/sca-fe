@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import FileUpload from '../../components/files/FileUpload'
 import FilesTable from '../../components/files/FilesTable'
@@ -28,8 +28,25 @@ function FilesPage() {
     toast.success(files.length === 1 ? `${files[0].name} uploaded` : `${files.length} files uploaded`)
   })
   const remove = useRequest(list.removeItem)
-  // Files need the login token, so they are downloaded before they can be previewed
-  const open = useRequest(async (file) => setOpened({ ...file, url: await getFileUrl(file) }))
+  // Id of the file in the preview, to ignore a download that finishes after the preview was closed
+  const openedId = useRef(null)
+
+  // Opens the preview right away (it shows a loader), then downloads the file.
+  // Files need the login token, so they are downloaded before they can be previewed.
+  const handleOpen = async (file) => {
+    openedId.current = file.id
+    setOpened(file)
+    try {
+      const url = await getFileUrl(file)
+      if (openedId.current !== file.id) return URL.revokeObjectURL(url)
+      setOpened({ ...file, url })
+    } catch (error) {
+      if (openedId.current !== file.id) return
+      openedId.current = null
+      setOpened(null)
+      toast.error(error.message)
+    }
+  }
 
   // Uploads only allowed files and lists the ones that were skipped
   const handleUpload = (files) => {
@@ -43,7 +60,8 @@ function FilesPage() {
   const handleDownload = (file) => downloadFile(file).catch((error) => toast.error(error.message))
 
   const handleClosePreview = () => {
-    URL.revokeObjectURL(opened.url)
+    openedId.current = null
+    if (opened.url) URL.revokeObjectURL(opened.url)
     setOpened(null)
   }
 
@@ -76,7 +94,7 @@ function FilesPage() {
         </Alert>
       )}
       <Alert>{upload.error && `Some files could not be uploaded. ${upload.error}`}</Alert>
-      <Alert>{open.error || list.error}</Alert>
+      <Alert>{list.error}</Alert>
 
       <section className="rounded-xl bg-surface shadow-sm">
         <div className="flex flex-wrap items-center gap-2 border-b border-gray-100 p-4">
@@ -90,8 +108,8 @@ function FilesPage() {
         </div>
         <FilesTable
           files={list.items}
-          loading={list.loading || open.loading}
-          onOpen={open.run}
+          loading={list.loading}
+          onOpen={handleOpen}
           onDownload={handleDownload}
           onDelete={setToDelete}
         />

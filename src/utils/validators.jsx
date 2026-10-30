@@ -49,11 +49,13 @@ export function validateSupport(form) {
   return errors
 }
 
-export function validateProfile(form) {
+// `requiredFields`: [{ id, label }] that must have a value
+export function validateProfile(form, requiredFields) {
   const errors = {}
-  if (!form.fullName.trim()) errors.fullName = 'Full name is required.'
-  if (!isEmail(form.email)) errors.email = 'Enter a valid email.'
-  if (!form.name.trim()) errors.name = 'School name is required.'
+  requiredFields.forEach(({ id, label }) => {
+    if (!form[id]?.trim()) errors[id] = `${label} is required.`
+  })
+  if (form.email && !isEmail(form.email)) errors.email = 'Enter a valid email.'
   return errors
 }
 
