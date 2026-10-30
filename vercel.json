@@ -1,5 +1,8 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "rewrites": [
+    { "source": "/__/auth/:path*", "destination": "https://sca-web-app.firebaseapp.com/__/auth/:path*" },
+    { "source": "/((?!assets/).*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

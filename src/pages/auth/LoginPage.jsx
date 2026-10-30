@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthHeader from '../../components/common/AuthHeader'
@@ -7,7 +8,7 @@ import Alert from '../../components/ui/Alert'
 import TextLink from '../../components/ui/TextLink'
 import useForm from '../../hooks/useForm'
 import useRequest from '../../hooks/useRequest'
-import { login, loginWithGoogle } from '../../services/authService'
+import { finishGoogleRedirect, login, loginWithGoogle } from '../../services/authService'
 import { signIn } from '../../store/authSlice'
 import { validateLogin } from '../../utils/validators'
 import googleIcon from '../../assets/google.svg'
@@ -18,15 +19,29 @@ function LoginPage() {
   const { form, errors, setErrors, handleChange } = useForm({ email: '', password: '' })
   const emailLogin = useRequest(login)
   const googleLogin = useRequest(loginWithGoogle)
-  const error = emailLogin.error || googleLogin.error
-  const busy = emailLogin.loading || googleLogin.loading
+  // Back from Google after a redirect sign-in: finish signing in (runs once, even in StrictMode)
+  const googleReturn = useRequest(finishGoogleRedirect)
+  const checkedRedirect = useRef(false)
+  const error = emailLogin.error || googleLogin.error || googleReturn.error
+  const googleBusy = googleLogin.loading || googleReturn.loading
+  const busy = emailLogin.loading || googleBusy
 
-  // `session` is { token, profile }, or true when the Google popup was closed
-  const finishSignIn = (session) => {
-    if (!session?.token) return
-    dispatch(signIn(session))
-    navigate('/dashboard', { replace: true })
-  }
+  // `session` is { token, profile }, or nothing to do (popup closed, redirecting, no redirect result)
+  const finishSignIn = useCallback(
+    (session) => {
+      if (!session?.token) return
+      dispatch(signIn(session))
+      navigate('/dashboard', { replace: true })
+    },
+    [dispatch, navigate],
+  )
+
+  const runGoogleReturn = googleReturn.run
+  useEffect(() => {
+    if (checkedRedirect.current) return
+    checkedRedirect.current = true
+    runGoogleReturn().then(finishSignIn)
+  }, [runGoogleReturn, finishSignIn])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -42,8 +57,8 @@ function LoginPage() {
     <>
       <AuthHeader title="Welcome back" subtitle="Sign in to your account" />
 
-      <Button type="button" variant="outline" onClick={handleGoogle} loading={googleLogin.loading} disabled={busy}>
-        {!googleLogin.loading && <img src={googleIcon} alt="" width="18" height="18" />}
+      <Button type="button" variant="outline" onClick={handleGoogle} loading={googleBusy} disabled={busy}>
+        {!googleBusy && <img src={googleIcon} alt="" width="18" height="18" />}
         Continue with Google
       </Button>
 

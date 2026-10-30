@@ -20,5 +20,10 @@ export const firebaseAuth = getAuth(app)
 export const googleProvider = new GoogleAuthProvider()
 googleProvider.setCustomParameters({ prompt: 'select_account' })
 
+// When the auth domain is this site itself (Vercel proxies /__/auth to Firebase, see vercel.json),
+// Google sign-in uses a full-page redirect: no popup, so no Cross-Origin-Opener-Policy console errors.
+// Otherwise (e.g. localhost, or before the domain is switched) it uses the popup.
+export const googleSignInByRedirect = firebaseConfig.authDomain === window.location.host
+
 // Analytics only runs in browsers that support it (not in tests or blocked environments)
 export const analyticsPromise = isSupported().then((supported) => (supported ? getAnalytics(app) : null))

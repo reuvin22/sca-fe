@@ -1,6 +1,6 @@
-import { signInWithPopup, signOut } from 'firebase/auth'
+import { getRedirectResult, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth'
 import api from '../api/axios'
-import { firebaseAuth, googleProvider } from '../api/firebase'
+import { firebaseAuth, googleProvider, googleSignInByRedirect } from '../api/firebase'
 import { AUTH_ROUTES, PROFILE_PHOTO_ROUTE, PROFILE_ROUTE } from '../api/routes'
 import { clearToken, saveToken } from '../utils/authStorage'
 
@@ -19,18 +19,44 @@ export function login({ email, password }) {
 // Google sign-in waits up to 2 minutes instead of failing with a connection error.
 const GOOGLE_LOGIN_TIMEOUT = 120000
 
-// Google sign-in runs in a Firebase popup. The backend checks the Google ID token.
+const googleFailed = (error) => new Error('Google sign-in failed. Please try again.', { cause: error })
+
+// The backend checks the Google ID token and returns our own login token
+async function sendGoogleToken(user) {
+  const idToken = await user.getIdToken()
+  return startSession(api.post(AUTH_ROUTES.google, { idToken }, { timeout: GOOGLE_LOGIN_TIMEOUT }))
+}
+
+// "Continue with Google". With the redirect (see api/firebase) the page goes to Google and comes back
+// to the login page, which then calls finishGoogleRedirect(). Otherwise a popup is used.
+// Returns { token, profile }, or null when nothing more happens here (redirecting, or popup closed).
 export async function loginWithGoogle() {
-  let idToken
+  if (googleSignInByRedirect) {
+    await signInWithRedirect(firebaseAuth, googleProvider)
+    return null // the browser is leaving this page
+  }
   try {
     const result = await signInWithPopup(firebaseAuth, googleProvider)
-    idToken = await result.user.getIdToken()
+    return await sendGoogleToken(result.user)
   } catch (error) {
     // Closing the popup is not an error worth showing
     if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') return null
-    throw new Error('Google sign-in failed. Please try again.', { cause: error })
+    // Firebase errors (they have a code) get a friendly message; backend errors are already friendly
+    throw error.code ? googleFailed(error) : error
   }
-  return startSession(api.post(AUTH_ROUTES.google, { idToken }, { timeout: GOOGLE_LOGIN_TIMEOUT }))
+}
+
+// After coming back from Google (redirect sign-in): finishes signing in.
+// Returns { token, profile }, or null when the page wasn't opened by a Google redirect.
+export async function finishGoogleRedirect() {
+  if (!googleSignInByRedirect) return null
+  let result
+  try {
+    result = await getRedirectResult(firebaseAuth)
+  } catch (error) {
+    throw googleFailed(error)
+  }
+  return result ? sendGoogleToken(result.user) : null
 }
 
 // Clears the saved token and the Google session (if any)
