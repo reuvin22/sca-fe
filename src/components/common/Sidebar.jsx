@@ -10,6 +10,7 @@ import {
   GraduationCap,
   MessagesSquare,
   Bug,
+  ClipboardCheck,
   Megaphone,
   UsersRound,
 } from 'lucide-react'
@@ -32,6 +33,7 @@ const links = [
 // Developers only
 const devLinks = [
   { to: '/dev/reports', label: 'Reports', icon: Bug },
+  { to: '/dev/feature-review', label: 'Feature Review', icon: ClipboardCheck },
   { to: '/dev/updates', label: 'Updates', icon: Megaphone },
   { to: '/dev/team', label: 'Team', icon: UsersRound },
 ]

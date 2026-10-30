@@ -5,7 +5,8 @@ import { formatDate } from '../../utils/dateHelpers'
 
 // One feature request: rank (#1 has the most votes among approved), status, votes.
 // `compact` is the smaller card used in "Your requests". `onVote` is only used for approved requests.
-function FeatureCard({ feature, onVote, voting, compact = false }) {
+// `actions` (developers' review buttons) also shows the full description.
+function FeatureCard({ feature, onVote, voting, compact = false, actions }) {
   const approved = feature.review === 'approved'
 
   return (
@@ -25,8 +26,11 @@ function FeatureCard({ feature, onVote, voting, compact = false }) {
           <Badge {...REVIEW[feature.review]} />
           {feature.mine && !compact && <Badge label="Yours" className="bg-brand-50 text-brand-700" />}
         </div>
-        {!compact && <p className="mt-1 line-clamp-3 text-sm whitespace-pre-wrap text-gray-600">{feature.description}</p>}
+        {!compact && (
+          <p className={`mt-1 text-sm whitespace-pre-wrap text-gray-600 ${actions ? '' : 'line-clamp-3'}`}>{feature.description}</p>
+        )}
         <p className="mt-1 text-xs text-gray-400">{formatDate(feature.createdAt.slice(0, 10))}</p>
+        {actions && <div className="mt-3 flex flex-wrap gap-2">{actions}</div>}
       </div>
 
       {/* Vote button (approved) or just the count */}

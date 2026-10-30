@@ -13,6 +13,7 @@ import FeatureRequestsPage from '../pages/features/FeatureRequestsPage'
 const DevReportsPage = lazy(() => import('../pages/dev/DevReportsPage'))
 const DevUpdatesPage = lazy(() => import('../pages/dev/DevUpdatesPage'))
 const DevTeamPage = lazy(() => import('../pages/dev/DevTeamPage'))
+const DevFeatureReviewPage = lazy(() => import('../pages/dev/DevFeatureReviewPage'))
 import DashboardPage from '../pages/dashboard/DashboardPage'
 import SettingsPage from '../pages/settings/SettingsPage'
 import CasesPage from '../pages/cases/CasesPage'
@@ -76,6 +77,7 @@ function AppRoutes() {
           }
         >
           <Route path="reports" element={<DevReportsPage />} />
+          <Route path="feature-review" element={<DevFeatureReviewPage />} />
           <Route path="updates" element={<DevUpdatesPage />} />
           <Route path="team" element={<DevTeamPage />} />
         </Route>

@@ -35,8 +35,19 @@ export const REVIEW = {
 
 export const REVIEW_OPTIONS = Object.entries(REVIEW).map(([value, { label }]) => ({ value, label }))
 
-// Feature Requests page filter. "All" = approved + under review (rejected only with its own filter).
-export const FEATURE_FILTERS = [{ value: 'all', label: 'All' }, ...REVIEW_OPTIONS]
+// "All" = approved + under review (rejected requests only show with their own filter)
+const ALL_FILTER = { value: 'all', label: 'All' }
+
+// Feature Requests page: All sits beside Rejected
+export const FEATURE_FILTERS = [...REVIEW_OPTIONS, ALL_FILTER]
+
+// Developers' Feature Review page: requests waiting for a decision come first
+export const REVIEW_PAGE_FILTERS = [
+  { value: 'under-review', label: 'Under Review' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'rejected', label: 'Rejected' },
+  ALL_FILTER,
+]
 
 export const REPORT_TYPE = {
   bug: { label: 'Bug', className: 'bg-red-100 text-red-700' },
