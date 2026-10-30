@@ -10,7 +10,7 @@ import Pagination from '../../components/ui/Pagination'
 import Skeleton from '../../components/ui/Skeleton'
 import usePaginatedList from '../../hooks/usePaginatedList'
 import { featureListService, myFeatureService, toggleFeatureVote } from '../../services/featureService'
-import { FEATURE_FILTERS } from '../../utils/reportBoardHelpers'
+import { FEATURE_FILTERS, PROGRESS_FILTERS } from '../../utils/reportBoardHelpers'
 
 const NO_FILTERS = {}
 
@@ -18,11 +18,12 @@ function ListSkeleton() {
   return Array.from({ length: 3 }, (_, i) => <Skeleton key={i} className="h-24 rounded-lg" />)
 }
 
-// Every feature request (left, most votes first, with search and a status filter; "All" leaves out rejected)
+// Every feature request (left, most votes first, with search and a status filter; "All" leaves out rejected;
+// Approved has a second filter for progress: All, In Queue, In Progress, Done)
 // and the user's own requests (right, 30%). Users vote on approved requests to set priorities.
 function FeatureRequestsPage() {
   // Opens on Approved: the requests users can vote on
-  const [filters, setFilters] = useState({ status: 'approved', search: '' })
+  const [filters, setFilters] = useState({ status: 'approved', progress: '', search: '' })
   const all = usePaginatedList(featureListService, null, filters)
   const mine = usePaginatedList(myFeatureService, null, NO_FILTERS)
   const [votingId, setVotingId] = useState(null)
@@ -83,7 +84,8 @@ function FeatureRequestsPage() {
                   type="button"
                   role="tab"
                   aria-selected={filters.status === option.value}
-                  onClick={() => setFilters({ ...filters, status: option.value })}
+                  // The progress filter only applies to Approved
+                  onClick={() => setFilters({ ...filters, status: option.value, progress: '' })}
                   className={`flex-1 cursor-pointer rounded-md px-3 py-1 text-sm whitespace-nowrap ${filters.status === option.value ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'}`}
                 >
                   {option.label}
@@ -92,12 +94,31 @@ function FeatureRequestsPage() {
             </div>
           </div>
 
+          {/* Second filter under Approved: how far the work is */}
+          {filters.status === 'approved' && (
+            <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Filter approved requests by progress">
+              <span className="text-xs font-medium tracking-wide text-gray-500 uppercase">Progress</span>
+              {PROGRESS_FILTERS.map((option) => (
+                <button
+                  key={option.value || 'all'}
+                  type="button"
+                  role="tab"
+                  aria-selected={filters.progress === option.value}
+                  onClick={() => setFilters({ ...filters, progress: option.value })}
+                  className={`cursor-pointer rounded-md border px-3 py-1 text-sm whitespace-nowrap ${filters.progress === option.value ? 'border-green-600 bg-green-600 text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
+
           <Alert>{all.error}</Alert>
           <div className="space-y-3">
             {all.loading && <ListSkeleton />}
             {!all.loading && all.items.length === 0 && (
               <p className="py-10 text-center text-sm text-gray-400">
-                {filters.search ? 'No feature requests match your search.' : 'No feature requests here yet.'}
+                {filters.search || filters.progress ? 'No feature requests match these filters.' : 'No feature requests here yet.'}
               </p>
             )}
             {!all.loading &&
