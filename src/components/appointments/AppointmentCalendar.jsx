@@ -9,6 +9,13 @@ const SLOT_HEIGHT = 64 // px for one 30-minute slot
 // Height in px based on duration (minimum one slot)
 const getHeight = (duration) => (Math.max(parseInt(duration) || 30, 30) / 30) * SLOT_HEIGHT
 
+// How many 30-minute slots "HH:MM" is after the first slot (7:00 AM). 9:15 → 4.5
+const toMinutes = (time) => {
+  const [hours, minutes] = time.split(':').map(Number)
+  return hours * 60 + minutes
+}
+const slotOffset = (time) => (toMinutes(time) - toMinutes(TIME_OPTIONS[0].value)) / 30
+
 const dayLabel = (iso, options) => new Date(`${iso}T00:00`).toLocaleDateString('en-US', options)
 
 // Week view. Drag an appointment to another slot to change its date and time.
@@ -91,8 +98,9 @@ function AppointmentCalendar({ appointments, loading, onSelect, onMove }) {
               {appointments
                 .filter((item) => item.date === day)
                 .map((item) => {
-                  const slot = TIME_OPTIONS.findIndex((option) => option.value === item.time)
-                  if (slot === -1) return null
+                  // Position from the time, so times between slots (e.g. 9:15) show in the right place
+                  const slot = slotOffset(item.time)
+                  if (slot < 0 || slot >= TIME_OPTIONS.length) return null
                   return (
                     <button
                       key={item.id}

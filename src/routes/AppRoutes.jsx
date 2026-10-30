@@ -7,6 +7,7 @@ import SettingsPage from '../pages/settings/SettingsPage'
 import CasesPage from '../pages/cases/CasesPage'
 import StudentsPage from '../pages/students/StudentsPage'
 import AppointmentsPage from '../pages/appointments/AppointmentsPage'
+import ConsultationPage from '../pages/consultation/ConsultationPage'
 import ReportsPage from '../pages/reports/ReportsPage'
 import FilesPage from '../pages/files/FilesPage'
 import TodoPage from '../pages/todo/TodoPage'
@@ -40,6 +41,7 @@ function AppRoutes() {
         <Route path="/cases" element={<CasesPage />} />
         <Route path="/students" element={<StudentsPage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
+        <Route path="/consultation" element={<ConsultationPage />} />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/files" element={<FilesPage />} />
         <Route path="/todo" element={<TodoPage />} />

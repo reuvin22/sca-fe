@@ -8,6 +8,7 @@ import {
   ListTodo,
   Settings,
   GraduationCap,
+  MessagesSquare,
 } from 'lucide-react'
 import useProfileComplete from '../../hooks/useProfileComplete'
 import { toggleSidebar } from '../../store/uiSlice'
@@ -17,6 +18,7 @@ const links = [
   { to: '/cases', label: 'Cases', icon: Users },
   { to: '/students', label: 'Students', icon: Users },
   { to: '/appointments', label: 'Appointments', icon: CalendarDays },
+  { to: '/consultation', label: 'Consultation', icon: MessagesSquare },
   { to: '/files', label: 'Files', icon: FolderOpen },
   { to: '/todo', label: 'To Do', icon: ListTodo },
   { to: '/settings', label: 'Settings', icon: Settings },

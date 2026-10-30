@@ -8,6 +8,8 @@ const authSlice = createSlice({
     token: getToken(),
     user: null,
     school: null,
+    // Temporary URL of the downloaded profile photo, or null (see useLoadProfilePhoto)
+    photoUrl: null,
   },
   reducers: {
     // payload: { user, school }
@@ -26,9 +28,13 @@ const authSlice = createSlice({
       state.token = null
       state.user = null
       state.school = null
+      state.photoUrl = null
+    },
+    setPhotoUrl: (state, action) => {
+      state.photoUrl = action.payload
     },
   },
 })
 
-export const { setProfile, signIn, signOut } = authSlice.actions
+export const { setProfile, signIn, signOut, setPhotoUrl } = authSlice.actions
 export default authSlice.reducer

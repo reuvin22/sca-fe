@@ -5,9 +5,9 @@ import { Pencil } from 'lucide-react'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import ProfileForm from '../../components/profile/ProfileForm'
+import ProfileHeader from '../../components/profile/ProfileHeader'
 import useProfileComplete from '../../hooks/useProfileComplete'
 import { COUNSELOR_FIELD, PERSONAL_FIELDS, SCHOOL_FIELDS } from '../../utils/profileHelpers'
-import { getInitials } from '../../utils/stringHelpers'
 
 // Read-only label/value list
 function DetailsCard({ title, fields, data }) {
@@ -55,19 +55,7 @@ function ProfilePage() {
         )}
       </div>
 
-      <Card>
-        <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
-          <span className="flex size-20 shrink-0 items-center justify-center rounded-full bg-brand-600 text-2xl font-semibold text-white">
-            {getInitials(user.fullName)}
-          </span>
-          <div>
-            <p className="text-xl font-semibold text-gray-900">{user.fullName}</p>
-            <p className="text-sm text-gray-500">
-              {user.role} · {school.name}
-            </p>
-          </div>
-        </div>
-      </Card>
+      <ProfileHeader />
 
       {mustComplete && (
         <p className="rounded-lg bg-brand-50 px-4 py-3 text-sm text-brand-700">

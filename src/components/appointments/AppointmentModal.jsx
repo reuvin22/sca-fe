@@ -1,7 +1,7 @@
 import FormModal from '../common/FormModal'
 import DynamicField from '../common/DynamicField'
 import StudentSelect from '../common/StudentSelect'
-import DatePicker from '../ui/DatePicker'
+import DateTimePicker from '../ui/DateTimePicker'
 import Select from '../ui/Select'
 import Textarea from '../ui/Textarea'
 import useForm from '../../hooks/useForm'
@@ -10,13 +10,10 @@ import {
   APPOINTMENT_DROPDOWNS,
   APPOINTMENT_STATUS_OPTIONS,
   REMINDER_OPTIONS,
-  TIME_OPTIONS,
   applyReschedule,
   emptyAppointment,
 } from '../../utils/appointmentHelpers'
 import { validateAppointment } from '../../utils/validators'
-
-const timeOptions = [{ value: '', label: 'Select time' }, ...TIME_OPTIONS]
 
 // Add mode when `appointment` is null, edit mode otherwise.
 function AppointmentModal({ appointment, onSave, onDelete, onClose }) {
@@ -47,8 +44,15 @@ function AppointmentModal({ appointment, onSave, onDelete, onClose }) {
       )}
       <div className="grid gap-4 sm:grid-cols-2">
         <StudentSelect id="studentName" value={form.studentName} onChange={handleChange} error={errors.studentName} />
-        <DatePicker label="Date" id="date" value={form.date} onChange={handleChange} error={errors.date} />
-        <Select label="Time" id="time" options={timeOptions} value={form.time} onChange={handleChange} error={errors.time} />
+        <DateTimePicker
+          label="Date & Time"
+          dateId="date"
+          timeId="time"
+          date={form.date}
+          time={form.time}
+          onChange={handleChange}
+          error={errors.date || errors.time}
+        />
         {APPOINTMENT_DROPDOWNS.map((field) => (
           <DynamicField key={field.id} field={field} value={form[field.id]} onChange={handleChange} />
         ))}

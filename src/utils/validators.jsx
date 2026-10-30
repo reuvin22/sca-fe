@@ -31,9 +31,10 @@ export function validateStudent(form) {
 
 export function validateAppointment(form) {
   const errors = {}
-  if (!form.studentName) errors.studentName = 'Student is required.'
+  if (!form.studentName.trim()) errors.studentName = 'Student is required.'
   if (!form.date) errors.date = 'Date is required.'
   if (!form.time) errors.time = 'Time is required.'
+  if (!form.date && !form.time) errors.date = 'Date and time are required.'
   return errors
 }
 

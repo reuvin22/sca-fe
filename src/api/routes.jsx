@@ -11,6 +11,7 @@ export const AUTH_ROUTES = {
 }
 
 export const PROFILE_ROUTE = '/profile'
+export const PROFILE_PHOTO_ROUTE = '/profile/photo'
 export const STUDENTS_ROUTE = '/students'
 export const CASES_ROUTE = '/cases'
 export const APPOINTMENTS_ROUTE = '/appointments'

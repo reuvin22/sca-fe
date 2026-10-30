@@ -6,14 +6,29 @@ import { fieldClass } from '../../utils/styles'
 // `onChange` gets an input-like event ({ target: { name, value } }) so it works with useForm.
 // `emptyLabel`: first choice that clears the value (e.g. "Any Sex" in filters).
 // `onCreate(text)`: when given, a typed value that isn't in the list can be added. Return true when saved.
-function SearchSelect({ label, ariaLabel, id, value, options, onChange, onCreate, emptyLabel, placeholder, error, disabled }) {
+// `freeText`: the typed text is the value (options are only suggestions), e.g. a student name.
+function SearchSelect({
+  label,
+  ariaLabel,
+  id,
+  value,
+  options,
+  onChange,
+  onCreate,
+  emptyLabel,
+  placeholder,
+  error,
+  disabled,
+  freeText = false,
+}) {
   const listId = useId()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [active, setActive] = useState(0)
+  // Free text starts with nothing highlighted, so Enter keeps what was typed
+  const [active, setActive] = useState(freeText ? -1 : 0)
   const [creating, setCreating] = useState(false)
 
-  const text = query.trim()
+  const text = (freeText ? value : query).trim()
   const exists = options.some((option) => option.toLowerCase() === text.toLowerCase())
   // What the list shows: { value, label, create? }
   const choices = [
@@ -43,14 +58,24 @@ function SearchSelect({ label, ariaLabel, id, value, options, onChange, onCreate
       e.preventDefault()
       if (!open) return setOpen(true)
       const step = e.key === 'ArrowDown' ? 1 : -1
-      setActive((i) => (i + step + choices.length) % Math.max(choices.length, 1))
-    } else if (e.key === 'Enter' && open) {
+      setActive((i) => (Math.max(i, -1) + step + choices.length) % Math.max(choices.length, 1))
+    } else if (e.key === 'Enter' && open && choices[active]) {
       e.preventDefault() // picks the option instead of submitting the form
-      if (choices[active]) choose(choices[active])
+      choose(choices[active])
     } else if (e.key === 'Escape') {
       close()
     }
   }
+
+  const handleType = (e) => {
+    if (freeText) onChange({ target: { name: id, value: e.target.value } })
+    else setQuery(e.target.value)
+    setActive(freeText ? -1 : 0)
+    setOpen(true)
+  }
+
+  // Free text with no matching suggestions: nothing to show
+  const showList = open && !(freeText && choices.length === 0)
 
   return (
     <div className="space-y-1">
@@ -71,19 +96,15 @@ function SearchSelect({ label, ariaLabel, id, value, options, onChange, onCreate
           autoComplete="off"
           className={`pr-9 ${fieldClass(error)}`}
           // While open the box is for searching; the current value shows as the placeholder
-          value={open ? query : value}
-          placeholder={(open && value) || placeholder}
+          value={freeText || !open ? value : query}
+          placeholder={(!freeText && open && value) || placeholder}
           disabled={disabled || creating}
           onFocus={() => {
             setOpen(true)
-            setActive(0)
+            setActive(freeText ? -1 : 0)
           }}
           onBlur={close}
-          onChange={(e) => {
-            setQuery(e.target.value)
-            setActive(0)
-            setOpen(true)
-          }}
+          onChange={handleType}
           onKeyDown={handleKeyDown}
         />
         {creating ? (
@@ -92,7 +113,7 @@ function SearchSelect({ label, ariaLabel, id, value, options, onChange, onCreate
           <ChevronDown size={16} className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-400" />
         )}
 
-        {open && (
+        {showList && (
           <ul
             id={listId}
             role="listbox"
@@ -110,7 +131,7 @@ function SearchSelect({ label, ariaLabel, id, value, options, onChange, onCreate
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => choose(choice)}
                   onMouseEnter={() => setActive(i)}
-                  className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm ${i === active ? 'bg-gray-100' : ''} ${choice.create ? 'font-medium text-brand-600' : 'text-gray-700'} ${selected ? 'font-semibold' : ''}`}
+                  className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm ${i === active ? 'bg-gray-100' : ''} ${choice.create ? 'font-medium text-brand-600' : 'text-gray-900'} ${selected ? 'font-semibold' : ''}`}
                 >
                   {choice.create && <Plus size={14} />}
                   {choice.label}

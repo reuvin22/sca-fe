@@ -1,7 +1,7 @@
 import { signInWithPopup, signOut } from 'firebase/auth'
 import api from '../api/axios'
 import { firebaseAuth, googleProvider } from '../api/firebase'
-import { AUTH_ROUTES, PROFILE_ROUTE } from '../api/routes'
+import { AUTH_ROUTES, PROFILE_PHOTO_ROUTE, PROFILE_ROUTE } from '../api/routes'
 import { clearToken, saveToken } from '../utils/authStorage'
 
 // Sign-in calls return { token, profile } and save the token. Put it in the store with signIn().
@@ -67,4 +67,23 @@ export async function resetPassword(token, password) {
 // `profile`: { user, school }. Returns the saved profile.
 export async function updateProfile(profile) {
   return (await api.put(PROFILE_ROUTE, profile)).data
+}
+
+// `file`: an image File (PNG, JPG or WEBP, max 2 MB). Returns the updated profile.
+export async function uploadProfilePhoto(file) {
+  const form = new FormData()
+  form.append('photo', file)
+  return (await api.post(PROFILE_PHOTO_ROUTE, form, { timeout: 60000 })).data
+}
+
+// The photo needs the login token, so it is downloaded and shown from a temporary URL.
+// Call URL.revokeObjectURL(url) when it is no longer shown.
+export async function getProfilePhotoUrl() {
+  const blob = await api.get(PROFILE_PHOTO_ROUTE, { responseType: 'blob' })
+  return URL.createObjectURL(blob)
+}
+
+// Returns the updated profile
+export async function deleteProfilePhoto() {
+  return (await api.delete(PROFILE_PHOTO_ROUTE)).data
 }

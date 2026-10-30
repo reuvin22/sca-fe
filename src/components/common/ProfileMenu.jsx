@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { ChevronDown, LogOut, UserRound } from 'lucide-react'
 import Dropdown from '../ui/Dropdown'
+import Avatar from './Avatar'
 import { logout } from '../../services/authService'
 import { signOut } from '../../store/authSlice'
 import { getShortName } from '../../utils/stringHelpers'
@@ -28,9 +29,7 @@ function ProfileMenu() {
       className="w-48"
       trigger={
         <>
-          <span className="flex size-9 items-center justify-center rounded-full bg-brand-600 text-white">
-            <UserRound size={18} />
-          </span>
+          <Avatar className="size-9 text-sm" />
           <span className="hidden font-semibold text-gray-900 sm:block">{getShortName(user.fullName)}</span>
           <ChevronDown size={16} className="hidden text-gray-400 sm:block" />
         </>

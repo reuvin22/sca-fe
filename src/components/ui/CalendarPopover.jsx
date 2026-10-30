@@ -1,12 +1,12 @@
 import { createPortal } from 'react-dom'
 
 const WIDTH = 288 // w-72
-const HEIGHT = 360
 
 // Floating panel below (or above) the `anchor` rect. Rendered in <body> so modals don't clip it.
-function CalendarPopover({ anchor, onClose, children }) {
+// `height` is about how tall the panel is, used to decide whether it fits below.
+function CalendarPopover({ anchor, onClose, children, height = 360 }) {
   const left = Math.max(16, Math.min(anchor.left, window.innerWidth - WIDTH - 16))
-  const fitsBelow = anchor.bottom + HEIGHT < window.innerHeight
+  const fitsBelow = anchor.bottom + height < window.innerHeight
   const position = fitsBelow
     ? { top: anchor.bottom + 8, left }
     : { bottom: window.innerHeight - anchor.top + 8, left }
