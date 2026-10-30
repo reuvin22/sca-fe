@@ -74,7 +74,8 @@ function FeatureRequestsPage() {
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
               />
             </div>
-            <div className="flex rounded-lg border border-gray-200 p-1" role="tablist" aria-label="Filter by status">
+            {/* Wraps onto two rows on narrow phones so no filter is pushed off screen */}
+            <div className="flex flex-wrap gap-1 rounded-lg border border-gray-200 p-1" role="tablist" aria-label="Filter by status">
               {FEATURE_FILTERS.map((option) => (
                 <button
                   key={option.value}
