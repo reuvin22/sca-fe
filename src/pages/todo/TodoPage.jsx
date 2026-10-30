@@ -83,7 +83,14 @@ function TodoPage() {
       )}
 
       {openCard && (
-        <CardModal key={openCard.id ?? 'new'} card={openCard} onSave={saveCard} onDelete={removeCard} onClose={() => setOpenCard(null)} />
+        <CardModal
+          key={openCard.id ?? 'new'}
+          card={openCard}
+          columns={board.columns}
+          onSave={saveCard}
+          onDelete={removeCard}
+          onClose={() => setOpenCard(null)}
+        />
       )}
     </div>
   )

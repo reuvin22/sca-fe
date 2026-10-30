@@ -1,21 +1,25 @@
 import Input from '../ui/Input'
-import Select from '../ui/Select'
+import SearchSelect from '../ui/SearchSelect'
 import useCategoryOptions from '../../hooks/useCategoryOptions'
+import useAddSettingsOption from '../../hooks/useAddSettingsOption'
+import { isDefaultSettingsCategory } from '../../utils/settingsHelpers'
 
-// Select with Settings options when a category matches `category` (defaults to `label`), otherwise a text Input.
-function FormField({ label, category = label, value, ...props }) {
+// Searchable dropdown with Settings options when a category matches `category` (defaults to `label`),
+// otherwise a text Input. A typed value that isn't in Settings can be added to it.
+function FormField({ label, category = label, value, type, ...props }) {
   const options = useCategoryOptions(category)
+  const addOption = useAddSettingsOption()
 
-  if (!options) return <Input label={label} value={value} {...props} />
-
-  // Keep an old value that is no longer in Settings so it isn't lost
-  const list = value && !options.includes(value) ? [value, ...options] : options
+  if (!options && !isDefaultSettingsCategory(category)) return <Input label={label} type={type} value={value} {...props} />
 
   return (
-    <Select
+    <SearchSelect
       label={label}
       value={value}
-      options={[{ value: '', label: `Select ${label}` }, ...list.map((option) => ({ value: option, label: option }))]}
+      options={options ?? []}
+      placeholder={`Search or add ${category}`}
+      emptyLabel={value ? 'Clear selection' : undefined}
+      onCreate={(text) => addOption(category, text)}
       {...props}
     />
   )

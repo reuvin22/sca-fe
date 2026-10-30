@@ -1,17 +1,19 @@
-import Select from '../ui/Select'
+import SearchSelect from '../ui/SearchSelect'
 import useCategoryOptions from '../../hooks/useCategoryOptions'
 
-// Compact filter dropdown with options from the matching Settings category.
-// The field label is the first option, so no label is needed above it.
+// Compact, searchable filter with options from the matching Settings category.
+// The field label is the placeholder, so no label is needed above it. Filters never add new options.
 function CategoryFilter({ field, value, onChange }) {
   const options = useCategoryOptions(field.category ?? field.label) ?? []
 
   return (
-    <div title={field.label}>
-      <Select
+    <div className="w-full sm:w-48" title={field.label}>
+      <SearchSelect
         id={field.id}
-        aria-label={field.label}
-        options={[{ value: '', label: field.label }, ...options.map((option) => ({ value: option, label: option }))]}
+        ariaLabel={field.label}
+        placeholder={field.label}
+        emptyLabel={`Any ${field.label}`}
+        options={options}
         value={value}
         onChange={onChange}
       />

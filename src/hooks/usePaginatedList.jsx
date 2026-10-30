@@ -45,9 +45,11 @@ function usePaginatedList(service, label, filters, { all = false } = {}) {
   const notify = (action) => label && toast.success(`${label} ${action}`)
 
   // Creates when there is no id, otherwise updates. Throws on failure so modals can show the error.
+  // New items are listed first, so go to page 1 to show them
   const saveItem = async (data) => {
     const saved = data.id ? await service.update(data) : await service.create(data)
     notify(data.id ? 'updated' : 'added')
+    if (!data.id) setPage(1)
     reload()
     return saved
   }

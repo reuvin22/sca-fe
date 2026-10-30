@@ -40,13 +40,20 @@ export const removeColumn = (board, id) => ({
   cards: board.cards.filter((card) => card.columnId !== id),
 })
 
-// Creates when the card has no id, otherwise updates
-export const saveCard = (board, card) => ({
-  ...board,
-  cards: card.id
-    ? board.cards.map((item) => (item.id === card.id ? card : item))
-    : [...board.cards, { ...card, id: crypto.randomUUID(), key: generateTaskId() }],
-})
+// Creates when the card has no id (new cards go first in their column), otherwise updates.
+// A card moved to another column (the modal's "Move to") goes to the top of that column.
+export function saveCard(board, card) {
+  if (!card.id) {
+    return { ...board, cards: [{ ...card, id: crypto.randomUUID(), key: generateTaskId() }, ...board.cards] }
+  }
+
+  const old = board.cards.find((item) => item.id === card.id)
+  const updated = { ...board, cards: board.cards.map((item) => (item.id === card.id ? card : item)) }
+  if (!old || old.columnId === card.columnId) return updated
+
+  const firstInColumn = board.cards.find((item) => item.columnId === card.columnId)
+  return moveCard(updated, card.id, card.columnId, firstInColumn?.id)
+}
 
 export const removeCard = (board, id) => ({ ...board, cards: board.cards.filter((card) => card.id !== id) })
 

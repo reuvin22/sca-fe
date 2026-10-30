@@ -9,8 +9,9 @@ const optionsSlice = createSlice({
     setCategories: (state, action) => {
       state.categories = action.payload
     },
+    // Newest first, same as the backend list
     addCategory: (state, action) => {
-      state.categories.push(action.payload)
+      state.categories.unshift(action.payload)
     },
     // Replaces a category with the saved version from the backend
     updateCategory: (state, action) => {

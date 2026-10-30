@@ -3,6 +3,16 @@ import { toast } from 'react-toastify'
 import { getBoard, saveBoard } from '../services/todoService'
 import * as todo from '../utils/todoHelpers'
 
+// Toast after saving a card: added, updated, or moved to another column
+function cardMessage(board, card) {
+  if (!card.id) return 'Card added'
+  const old = board.cards.find((item) => item.id === card.id)
+  if (old && old.columnId !== card.columnId) {
+    return `Card moved to ${board.columns.find((column) => column.id === card.columnId)?.title}`
+  }
+  return 'Card updated'
+}
+
 // Board state for the To Do page. Each action saves the updated board.
 function useTodoBoard() {
   const [board, setBoard] = useState(null)
@@ -36,7 +46,7 @@ function useTodoBoard() {
     addColumn: (title) => update((b) => todo.addColumn(b, title), 'Column added'),
     renameColumn: (id, title) => update((b) => todo.renameColumn(b, id, title), 'Column updated'),
     removeColumn: (id) => update((b) => todo.removeColumn(b, id), 'Column deleted'),
-    saveCard: (card) => update((b) => todo.saveCard(b, card), card.id ? 'Card updated' : 'Card added'),
+    saveCard: (card) => update((b) => todo.saveCard(b, card), cardMessage(board, card)),
     removeCard: (id) => update((b) => todo.removeCard(b, id), 'Card deleted'),
     moveCard,
   }

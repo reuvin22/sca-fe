@@ -9,7 +9,8 @@ import { PRIORITY_OPTIONS, emptyCard } from '../../utils/todoHelpers'
 import { validateTitle } from '../../utils/validators'
 
 // `card` always has a columnId. Add mode when it has no id.
-function CardModal({ card, onSave, onDelete, onClose }) {
+// `columns`: every board column, listed in "Move to" when editing a card.
+function CardModal({ card, columns, onSave, onDelete, onClose }) {
   const isEdit = Boolean(card.id)
   const { form, errors, setErrors, handleChange } = useForm({ ...emptyCard, ...card })
   const save = useRequest(onSave)
@@ -33,6 +34,15 @@ function CardModal({ card, onSave, onDelete, onClose }) {
       saving={save.loading}
       error={save.error}
     >
+      {isEdit && (
+        <Select
+          label="Move to"
+          id="columnId"
+          options={columns.map((column) => ({ value: column.id, label: column.title }))}
+          value={form.columnId}
+          onChange={handleChange}
+        />
+      )}
       <Input label="Title" id="title" value={form.title} onChange={handleChange} error={errors.title} autoFocus />
       <Textarea label="Description" id="description" value={form.description} onChange={handleChange} />
       <div className="grid gap-4 sm:grid-cols-2">
