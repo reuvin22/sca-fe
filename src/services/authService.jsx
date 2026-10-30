@@ -71,8 +71,8 @@ export async function getMe() {
 }
 
 // `data`: { fullName, email, password }. Sends the confirmation email.
-export async function register({ fullName, email, password }) {
-  return (await api.post(AUTH_ROUTES.register, { fullName, email, password })).data
+export async function register({ fullName, email, password, phone, address }) {
+  return (await api.post(AUTH_ROUTES.register, { fullName, email, password, phone, address })).data
 }
 
 export async function resendConfirmation(email) {

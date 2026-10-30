@@ -1,3 +1,5 @@
+import { MOBILE_ERROR, isMobileNumber } from './addressHelpers'
+
 export const isEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 
 export function validatePassword({ password, confirmPassword }) {
@@ -57,11 +59,26 @@ export function validateProfile(form, requiredFields) {
     if (!form[id]?.trim()) errors[id] = `${label} is required.`
   })
   if (form.email && !isEmail(form.email)) errors.email = 'Enter a valid email.'
+  if (form.phone?.trim() && !isMobileNumber(form.phone)) errors.phone = MOBILE_ERROR
+  const addressErrors = validateAddress(form.address)
+  if (Object.keys(addressErrors).length) errors.address = addressErrors
+  return errors
+}
+
+// Field errors for AddressFields ({} when complete)
+export function validateAddress(address) {
+  const errors = {}
+  if (!address?.region) errors.region = 'Region is required.'
+  else if (!address.city) errors.city = 'City / municipality is required.'
+  else if (!address.barangay) errors.barangay = 'Barangay is required.'
   return errors
 }
 
 export function validateRegister(form) {
   const errors = validatePassword(form)
+  if (!isMobileNumber(form.phone)) errors.phone = MOBILE_ERROR
+  const addressErrors = validateAddress(form.address)
+  if (Object.keys(addressErrors).length) errors.address = addressErrors
   if (!form.fullName.trim()) errors.fullName = 'Full name is required.'
   if (!isEmail(form.email)) errors.email = 'Enter a valid email.'
   return errors
