@@ -35,7 +35,14 @@ function RegisterPage() {
 
   return (
     <>
-      <AuthHeader title="Create an account" subtitle="Register to get started" />
+      <AuthHeader
+        title="Create account"
+        subtitle={
+          <>
+            Already have an account? <TextLink to="/login">Sign in</TextLink>
+          </>
+        }
+      />
 
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <Alert>{error}</Alert>
@@ -93,10 +100,6 @@ function RegisterPage() {
           {loading ? 'Creating account...' : 'Register'}
         </Button>
       </form>
-
-      <p className="mt-6 text-center text-sm text-gray-500">
-        Already have an account? <TextLink to="/login">Sign in</TextLink>
-      </p>
     </>
   )
 }

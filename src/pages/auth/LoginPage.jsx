@@ -61,7 +61,14 @@ function LoginPage() {
 
   return (
     <>
-      <AuthHeader title="Welcome back" subtitle="Sign in to your account" />
+      <AuthHeader
+        title="Sign in"
+        subtitle={
+          <>
+            Don't have an account? <TextLink to="/register">Create your account</TextLink>
+          </>
+        }
+      />
 
       <Button type="button" variant="outline" onClick={handleGoogle} loading={googleBusy} disabled={busy}>
         {!googleBusy && <img src={googleIcon} alt="" width="18" height="18" />}
@@ -98,10 +105,6 @@ function LoginPage() {
           {emailLogin.loading ? 'Signing in...' : 'Sign in'}
         </Button>
       </form>
-
-      <p className="mt-6 text-center text-sm text-gray-500">
-        Don't have an account? <TextLink to="/register">Register</TextLink>
-      </p>
     </>
   )
 }
