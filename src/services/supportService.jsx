@@ -23,3 +23,8 @@ export async function getReportAttachmentUrl(reportId, index) {
   const blob = await api.get(`${SUPPORT_ROUTE}/${reportId}/attachments/${index}`, { responseType: 'blob', timeout: UPLOAD_TIMEOUT })
   return URL.createObjectURL(blob)
 }
+
+// Developers: one report with everything shown on the board (reporter, column, assignee, review)
+export async function getReport(id) {
+  return (await api.get(`${SUPPORT_ROUTE}/${id}`)).data
+}

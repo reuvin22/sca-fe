@@ -6,12 +6,29 @@ import { formatDate } from '../../utils/dateHelpers'
 // One feature request: rank (#1 has the most votes among approved), status, votes.
 // `compact` is the smaller card used in "Your requests". `onVote` is only used for approved requests.
 // `actions` (developers' review buttons) also shows the full description.
-function FeatureCard({ feature, onVote, voting, compact = false, actions }) {
+// `onOpen(feature)` makes the whole card clickable (mouse or Enter/Space), e.g. to open details.
+function FeatureCard({ feature, onVote, voting, compact = false, actions, onOpen }) {
   const approved = feature.review === 'approved'
+  const clickable = onOpen
+    ? {
+        role: 'button',
+        tabIndex: 0,
+        'aria-label': `Open ${feature.subject}`,
+        onClick: () => onOpen(feature),
+        onKeyDown: (e) => {
+          if (e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return
+          e.preventDefault()
+          onOpen(feature)
+        },
+      }
+    : {}
 
   return (
     // Card color follows the status: green approved, orange under review, red rejected
-    <article className={`flex gap-3 rounded-lg border border-l-4 ${REVIEW[feature.review].card} ${compact ? 'p-3' : 'p-4'}`}>
+    <article
+      {...clickable}
+      className={`flex gap-3 rounded-lg border border-l-4 ${REVIEW[feature.review].card} ${compact ? 'p-3' : 'p-4'} ${onOpen ? 'cursor-pointer transition hover:shadow-md' : ''}`}
+    >
       {/* Rank (approved) or a dash (not ranked yet) */}
       <div
         className={`flex shrink-0 items-center justify-center rounded-lg font-bold ${compact ? 'size-9 text-sm' : 'size-11 text-base'} ${approved ? 'bg-brand-50 text-brand-700' : 'bg-gray-100 text-gray-400'}`}
@@ -30,14 +47,22 @@ function FeatureCard({ feature, onVote, voting, compact = false, actions }) {
           <p className={`mt-1 text-sm whitespace-pre-wrap text-gray-600 ${actions ? '' : 'line-clamp-3'}`}>{feature.description}</p>
         )}
         <p className="mt-1 text-xs text-gray-400">{formatDate(feature.createdAt.slice(0, 10))}</p>
-        {actions && <div className="mt-3 flex flex-wrap gap-2">{actions}</div>}
+        {/* Buttons work on their own without also opening the card */}
+        {actions && (
+          <div className="mt-3 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+            {actions}
+          </div>
+        )}
       </div>
 
       {/* Vote button (approved) or just the count */}
       {approved && onVote ? (
         <button
           type="button"
-          onClick={() => onVote(feature)}
+          onClick={(e) => {
+            e.stopPropagation() // voting doesn't open the card
+            onVote(feature)
+          }}
           disabled={voting}
           aria-pressed={feature.voted}
           aria-label={feature.voted ? `Remove your vote (${feature.votes} votes)` : `Vote (${feature.votes} votes)`}

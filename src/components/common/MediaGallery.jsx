@@ -9,15 +9,20 @@ function MediaGallery({ items, loadUrl }) {
   const [failed, setFailed] = useState(false)
   const [zoomed, setZoomed] = useState(null)
 
+  // Downloads again only when the attachments themselves change, not when the parent passes
+  // a new array with the same items (e.g. after changing a report's column), so nothing flashes
+  const indexKey = items.map((item) => item.index).join(',')
+
   useEffect(() => {
     let cancelled = false
     const loaded = []
-    items.forEach((item) =>
-      loadUrl(item.index)
+    const indexes = indexKey ? indexKey.split(',').map(Number) : []
+    indexes.forEach((index) =>
+      loadUrl(index)
         .then((url) => {
           if (cancelled) return URL.revokeObjectURL(url)
           loaded.push(url)
-          setUrls((prev) => ({ ...prev, [item.index]: url }))
+          setUrls((prev) => ({ ...prev, [index]: url }))
         })
         .catch(() => !cancelled && setFailed(true)),
     )
@@ -25,7 +30,7 @@ function MediaGallery({ items, loadUrl }) {
       cancelled = true
       loaded.forEach((url) => URL.revokeObjectURL(url))
     }
-  }, [items, loadUrl])
+  }, [indexKey, loadUrl])
 
   if (items.length === 0) return null
 

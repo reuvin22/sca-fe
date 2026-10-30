@@ -44,6 +44,16 @@ Before building a feature, inspect the existing structure, docs, and code. Do no
 - Use Redux Toolkit for shared state. Avoid prop drilling.
 - Passing props 1 level down (parent → child) is fine; use the store when data goes deeper or is shared.
 
+## Avoid Re-renders (HARD rule)
+Create, update, delete, vote and other changes must never blank or flash the screen.
+- **Skeletons only on the first load.** After that, keep the current rows on screen while new data loads (`usePaginatedList` gives `loading` for the first load and `refreshing` for background reloads). Never pass a background reload to a table's `loading`.
+- **Update the list right away after CRUD**: replace the edited row in place, remove the deleted row, add the new row at the top. Then reload quietly to sync with the server. `usePaginatedList`'s `saveItem` / `removeItem` already do this — use them instead of re-fetching with a spinner.
+- **Opening details or a file must not reload the list.** Show the loading state inside the modal/preview, not on the table.
+- **Keep references stable** so effects don't re-run: define services and constant objects outside components, wrap callbacks passed to hooks or children in `useCallback`, and give effects simple dependencies (ids or keys, not new arrays/objects made on every render). Example: `MediaGallery` depends on the attachment indexes, not the `items` array.
+- **Don't download things twice.** Files, images and videos (blob URLs) load once and are revoked when no longer shown.
+- **Optimistic UI for quick actions** (drag and drop, votes): change the screen first, save in the background, and roll back with an error toast if saving fails.
+- Before finishing a task, check: after each CRUD action, does anything on screen flash, disappear, or reload that didn't change?
+
 ## API
 - Keep API code separate from UI:
   - `src/api/axios.jsx` — axios instance (base URL, headers, interceptors).
