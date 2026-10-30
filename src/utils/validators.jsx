@@ -4,7 +4,9 @@ export const isEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 
 export function validatePassword({ password, confirmPassword }) {
   const errors = {}
+  // Same rule as the server (which also rejects the most common passwords)
   if (password.length < 8) errors.password = 'Password must be at least 8 characters.'
+  else if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) errors.password = 'Use both letters and numbers.'
   if (password !== confirmPassword) errors.confirmPassword = 'Passwords do not match.'
   return errors
 }

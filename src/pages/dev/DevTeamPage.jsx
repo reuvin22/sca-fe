@@ -29,13 +29,8 @@ function DevTeamPage() {
     setEmailError('')
     const result = await invite.run(email.trim())
     if (result) {
-      // An existing account gets the developer role right away instead of an invitation
-      if (result.added) {
-        toast.success(`${result.email} already has an account and is now on the team`)
-        team.reload()
-      } else {
-        toast.success(`Invitation sent to ${result.email}`)
-      }
+      // Existing accounts join only after accepting the emailed invitation
+      toast.success(`Invitation sent to ${result.email}`)
       setEmail('')
     }
   }

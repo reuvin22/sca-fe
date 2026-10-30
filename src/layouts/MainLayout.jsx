@@ -2,10 +2,13 @@ import { Outlet } from 'react-router-dom'
 import Sidebar from '../components/common/Sidebar'
 import Navbar from '../components/common/Navbar'
 import useLoadProfilePhoto from '../hooks/useLoadProfilePhoto'
+import useIdleLogout from '../hooks/useIdleLogout'
 
 function MainLayout() {
   // Shown in the navbar and on the Profile page
   useLoadProfilePhoto()
+  // Signed-in pages only: sign out after 30 minutes of no activity
+  useIdleLogout()
 
   return (
     <div className="flex min-h-screen bg-page">

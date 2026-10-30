@@ -2,7 +2,7 @@ import { getRedirectResult, signInWithPopup, signInWithRedirect, signOut } from 
 import api from '../api/axios'
 import { firebaseAuth, googleProvider, googleSignInByRedirect } from '../api/firebase'
 import { AUTH_ROUTES, PROFILE_PHOTO_ROUTE, PROFILE_ROUTE } from '../api/routes'
-import { clearToken, saveToken } from '../utils/authStorage'
+import { clearToken, getToken, saveToken } from '../utils/authStorage'
 
 // Sign-in calls return { token, profile } and save the token. Put it in the store with signIn().
 async function startSession(request) {
@@ -11,8 +11,20 @@ async function startSession(request) {
   return session
 }
 
-export function login({ email, password }) {
-  return startSession(api.post(AUTH_ROUTES.login, { email, password }))
+// Password sign-in, step 1: checks the password and emails a 6-digit code.
+// Returns { codeRequired, challenge, email (masked) } for step 2.
+export async function login({ email, password }) {
+  return (await api.post(AUTH_ROUTES.login, { email, password })).data
+}
+
+// Step 2: the code from the email. Returns { token, profile } and saves the token.
+export function verifyLoginCode({ challenge, code }) {
+  return startSession(api.post(AUTH_ROUTES.loginVerify, { challenge, code }))
+}
+
+// Emails a new code for the same sign-in
+export async function resendLoginCode(challenge) {
+  return (await api.post(AUTH_ROUTES.loginResend, { challenge })).data
 }
 
 // The backend is on Render's free plan: when it is asleep it needs about 50 s to wake up.
@@ -59,11 +71,21 @@ export async function finishGoogleRedirect() {
   return result ? sendGoogleToken(result.user) : null
 }
 
-// Clears the saved token and the Google session (if any)
+// Signs out this device: the server stops accepting the token, then the saved token and the
+// Google session (if any) are cleared. Works offline too (the token is still removed here).
 export async function logout() {
+  if (getToken()) await api.post(AUTH_ROUTES.logout).catch(() => {})
   clearToken()
   await signOut(firebaseAuth).catch(() => {})
 }
+
+// Signs out every device where this account is signed in, including this one
+export async function logoutEverywhere() {
+  await api.post(AUTH_ROUTES.logoutAll)
+  clearToken()
+  await signOut(firebaseAuth).catch(() => {})
+}
+
 
 // { user, school } of the signed-in user
 export async function getMe() {
@@ -118,7 +140,7 @@ export async function deleteProfilePhoto() {
   return (await api.delete(PROFILE_PHOTO_ROUTE)).data
 }
 
-// Developer invitation: { email } of the invited person (doesn't use the invitation up)
+// Developer invitation: { email, hasAccount } of the invited person (doesn't use the invitation up)
 export async function getInvitation(token) {
   if (!token) throw new Error('This invitation link is invalid or has expired.')
   return (await api.get(AUTH_ROUTES.invitation(token))).data
@@ -127,4 +149,9 @@ export async function getInvitation(token) {
 // Creates the developer account from the invitation and signs in. Returns { token, profile }.
 export function registerDeveloper({ token, fullName, password }) {
   return startSession(api.post(AUTH_ROUTES.registerDeveloper, { token, fullName, password }))
+}
+
+// An existing account accepts the invitation and gets the developer role. Returns { email }.
+export async function acceptInvitation(token) {
+  return (await api.post(AUTH_ROUTES.acceptInvitation, { token })).data
 }

@@ -6,7 +6,16 @@
   "headers": [
     {
       "source": "/(.*)",
-      "headers": [{ "key": "Cross-Origin-Opener-Policy", "value": "same-origin-allow-popups" }]
+      "headers": [
+        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin-allow-popups" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' https://apis.google.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://cdn.jsdelivr.net https://www.googletagmanager.com https://*.google-analytics.com; font-src 'self' data:; media-src 'self' blob:; connect-src 'self' https://sca-web-be.onrender.com https://psgc.gitlab.io https://*.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; frame-src 'self' https://sca-web-app.firebaseapp.com https://accounts.google.com https://apis.google.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+        },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=()" }
+      ]
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthHeader from '../../components/common/AuthHeader'
@@ -6,6 +6,7 @@ import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import Alert from '../../components/ui/Alert'
 import TextLink from '../../components/ui/TextLink'
+import LoginCodeForm from '../../components/auth/LoginCodeForm'
 import useForm from '../../hooks/useForm'
 import useRequest from '../../hooks/useRequest'
 import { finishGoogleRedirect, login, loginWithGoogle } from '../../services/authService'
@@ -22,6 +23,8 @@ function LoginPage() {
   // Back from Google after a redirect sign-in: finish signing in (runs once, even in StrictMode)
   const googleReturn = useRequest(finishGoogleRedirect)
   const checkedRedirect = useRef(false)
+  // After the password: { challenge, email } while waiting for the emailed code
+  const [pending, setPending] = useState(null)
   const error = emailLogin.error || googleLogin.error || googleReturn.error
   const googleBusy = googleLogin.loading || googleReturn.loading
   const busy = emailLogin.loading || googleBusy
@@ -48,10 +51,13 @@ function LoginPage() {
     const newErrors = validateLogin(form)
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
-    finishSignIn(await emailLogin.run(form))
+    const result = await emailLogin.run(form)
+    if (result?.codeRequired) setPending(result)
   }
 
   const handleGoogle = async () => finishSignIn(await googleLogin.run())
+
+  if (pending) return <LoginCodeForm pending={pending} onSignedIn={finishSignIn} onBack={() => setPending(null)} />
 
   return (
     <>

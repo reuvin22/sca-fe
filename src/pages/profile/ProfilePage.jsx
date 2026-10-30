@@ -6,6 +6,7 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import ProfileForm from '../../components/profile/ProfileForm'
 import ProfileHeader from '../../components/profile/ProfileHeader'
+import SecurityCard from '../../components/profile/SecurityCard'
 import useProfileComplete from '../../hooks/useProfileComplete'
 import { COUNSELOR_FIELD, PERSONAL_FIELDS, SCHOOL_FIELDS } from '../../utils/profileHelpers'
 import { formatAddress } from '../../utils/addressHelpers'
@@ -94,6 +95,7 @@ function ProfilePage() {
             fields={[...SCHOOL_FIELDS, COUNSELOR_FIELD]}
             data={{ ...school, counselorAssociate: user.fullName }}
           />
+          <SecurityCard />
         </>
       )}
     </div>

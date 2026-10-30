@@ -2,6 +2,10 @@
 export const AUTH_ROUTES = {
   register: '/auth/register',
   login: '/auth/login',
+  loginVerify: '/auth/login/verify',
+  loginResend: '/auth/login/resend',
+  logout: '/auth/logout',
+  logoutAll: '/auth/logout-all',
   google: '/auth/google',
   me: '/auth/me',
   resendConfirmation: '/auth/resend-confirmation',
@@ -10,10 +14,12 @@ export const AUTH_ROUTES = {
   resetPassword: '/auth/reset-password',
   invitation: (token) => `/auth/invitations/${token}`,
   registerDeveloper: '/auth/register-developer',
+  acceptInvitation: '/auth/accept-invitation',
 }
 
 export const PROFILE_ROUTE = '/profile'
 export const PROFILE_PHOTO_ROUTE = '/profile/photo'
+export const ACTIVITY_ROUTE = '/profile/activity'
 export const STUDENTS_ROUTE = '/students'
 export const CASES_ROUTE = '/cases'
 export const APPOINTMENTS_ROUTE = '/appointments'

@@ -7,6 +7,7 @@ import Button from '../../components/ui/Button'
 import Alert from '../../components/ui/Alert'
 import Skeleton from '../../components/ui/Skeleton'
 import TextLink from '../../components/ui/TextLink'
+import AcceptInvitation from '../../components/auth/AcceptInvitation'
 import useFetch from '../../hooks/useFetch'
 import useForm from '../../hooks/useForm'
 import useRequest from '../../hooks/useRequest'
@@ -14,7 +15,8 @@ import { getInvitation, registerDeveloper } from '../../services/authService'
 import { signIn } from '../../store/authSlice'
 import { validatePassword } from '../../utils/validators'
 
-// Opened from the developer invitation email. Creates a developer account for the invited email.
+// Opened from the developer invitation email. Creates a developer account for the invited email,
+// or, when the email already has an account, lets its owner accept the invitation.
 function DevRegisterPage() {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
@@ -61,6 +63,8 @@ function DevRegisterPage() {
       </>
     )
   }
+
+  if (invitation.data.hasAccount) return <AcceptInvitation token={token} email={invitation.data.email} />
 
   return (
     <>
