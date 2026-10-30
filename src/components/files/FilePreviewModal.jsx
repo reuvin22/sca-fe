@@ -2,10 +2,11 @@ import { Download, FileQuestion, LoaderCircle } from 'lucide-react'
 import Modal from '../ui/Modal'
 import Skeleton from '../ui/Skeleton'
 import SheetPreview from './SheetPreview'
+import SlidePreview from './SlidePreview'
 import { formatSize, getFileKind } from '../../utils/fileHelpers'
 
-// Shows images, PDFs, CSV and Excel (.xlsx). Other types can only be downloaded.
-// `file.url` is empty while the file is still downloading.
+// Shows images, PDFs, CSV, Excel (.xlsx) and PowerPoint (.pptx, with presenter controls).
+// Other types can only be downloaded. `file.url` is empty while the file is still downloading.
 function FilePreviewModal({ file, onClose }) {
   const kind = getFileKind(file.name).label
 
@@ -30,9 +31,13 @@ function FilePreviewModal({ file, onClose }) {
     Image: <img src={file.url} alt={file.name} loading="lazy" className="mx-auto max-h-[70vh] w-auto object-contain" />,
     PDF: <iframe src={file.url} title={file.name} className="h-[70vh] w-full rounded-lg border border-gray-200" />,
     CSV: <SheetPreview file={file} kind={kind} />,
-    // Old .xls files can't be read in the browser
+    // Old .xls and .ppt files can't be read in the browser
     Excel: file.name.toLowerCase().endsWith('.xlsx') && <SheetPreview file={file} kind={kind} />,
+    PowerPoint: file.name.toLowerCase().endsWith('.pptx') && <SlidePreview file={file} />,
   }[kind]
+
+  // Old .ppt format: say how to make it presentable here
+  const isOldPpt = kind === 'PowerPoint' && !preview
 
   return (
     <Modal title={file.name} onClose={onClose} className="max-w-4xl">
@@ -40,7 +45,11 @@ function FilePreviewModal({ file, onClose }) {
         <div className="flex flex-col items-center gap-2 py-10 text-center">
           <FileQuestion size={40} className="text-gray-300" />
           <p className="text-sm text-gray-600">Preview is not available for this file.</p>
-          <p className="text-xs text-gray-400">Download the file to open it.</p>
+          <p className="text-xs text-gray-400">
+            {isOldPpt
+              ? 'Old .ppt files can’t be shown here. Open it in PowerPoint and save it as .pptx, then upload it again.'
+              : 'Download the file to open it.'}
+          </p>
         </div>
       )}
 
