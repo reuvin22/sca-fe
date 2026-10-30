@@ -3,16 +3,30 @@ import { toast } from 'react-toastify'
 import { Trash2 } from 'lucide-react'
 import Card from '../ui/Card'
 import TagInput from '../ui/TagInput'
-import { addOption, removeCategory, removeOption } from '../../store/optionsSlice'
+import { deleteCategory, updateOptions } from '../../services/categoryService'
+import { removeCategory, updateCategory } from '../../store/optionsSlice'
+
+// Shows a toast for the result of a save
+const withToast = (request, message) =>
+  request.then(() => toast.success(message)).catch((error) => toast.error(error.message))
 
 function CategoryCard({ category }) {
   const dispatch = useDispatch()
   const { id, name, options } = category
 
+  // Saves the new options list, then updates the store with the saved category
+  const saveOptions = (next, message) =>
+    withToast(
+      updateOptions(id, next).then((saved) => dispatch(updateCategory(saved))),
+      message,
+    )
+
   const handleDelete = () => {
     if (!window.confirm(`Delete "${name}" and all its options?`)) return
-    dispatch(removeCategory(id))
-    toast.success(`${name} category deleted`)
+    withToast(
+      deleteCategory(id).then(() => dispatch(removeCategory(id))),
+      `${name} category deleted`,
+    )
   }
 
   return (
@@ -32,14 +46,13 @@ function CategoryCard({ category }) {
         id={`option-${id}`}
         items={options}
         placeholder={`Add ${name} option`}
-        onAdd={(option) => {
-          dispatch(addOption({ categoryId: id, option }))
-          toast.success(`${option} added to ${name}`)
-        }}
-        onRemove={(option) => {
-          dispatch(removeOption({ categoryId: id, option }))
-          toast.success(`${option} removed from ${name}`)
-        }}
+        onAdd={(option) => saveOptions([...options, option], `${option} added to ${name}`)}
+        onRemove={(option) =>
+          saveOptions(
+            options.filter((item) => item !== option),
+            `${option} removed from ${name}`,
+          )
+        }
       />
     </Card>
   )

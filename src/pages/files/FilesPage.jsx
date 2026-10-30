@@ -8,35 +8,44 @@ import Alert from '../../components/ui/Alert'
 import Input from '../../components/ui/Input'
 import Select from '../../components/ui/Select'
 import ConfirmModal from '../../components/ui/ConfirmModal'
-import useCrud from '../../hooks/useCrud'
+import Pagination from '../../components/ui/Pagination'
+import usePaginatedList from '../../hooks/usePaginatedList'
 import useRequest from '../../hooks/useRequest'
-import { fileService } from '../../services/fileService'
-import { FILE_COLUMNS, FILE_KIND_OPTIONS, emptyFileFilters, filterFiles, validateFile } from '../../utils/fileHelpers'
-import { exportTable } from '../../utils/export/exportTable'
+import { downloadFile, fileService, getFileUrl } from '../../services/fileService'
+import { FILE_COLUMNS, FILE_KIND_OPTIONS, emptyFileFilters, validateFile } from '../../utils/fileHelpers'
+import { exportAllRows } from '../../utils/export/exportAllRows'
 
 function FilesPage() {
-  const { items: files, loading, saveItem, removeItem } = useCrud(fileService)
   const [filters, setFilters] = useState(emptyFileFilters)
+  const list = usePaginatedList(fileService, null, filters)
   const [toDelete, setToDelete] = useState(null)
   const [opened, setOpened] = useState(null)
   const [rejected, setRejected] = useState([])
-  const visibleFiles = filterFiles(files, filters)
 
   // Uploads one at a time so each file appears as it finishes
-  const upload = useRequest(async (list) => {
-    for (const file of list) await saveItem(file)
-    toast.success(list.length === 1 ? `${list[0].name} uploaded` : `${list.length} files uploaded`)
+  const upload = useRequest(async (files) => {
+    for (const file of files) await list.saveItem(file)
+    toast.success(files.length === 1 ? `${files[0].name} uploaded` : `${files.length} files uploaded`)
   })
-  const remove = useRequest(removeItem)
+  const remove = useRequest(list.removeItem)
+  // Files need the login token, so they are downloaded before they can be previewed
+  const open = useRequest(async (file) => setOpened({ ...file, url: await getFileUrl(file) }))
 
   // Uploads only allowed files and lists the ones that were skipped
-  const handleUpload = (list) => {
-    setRejected(list.map(validateFile).filter(Boolean))
-    const allowed = list.filter((file) => !validateFile(file))
+  const handleUpload = (files) => {
+    setRejected(files.map(validateFile).filter(Boolean))
+    const allowed = files.filter((file) => !validateFile(file))
     if (allowed.length) upload.run(allowed)
   }
 
   const handleChange = (e) => setFilters({ ...filters, [e.target.name]: e.target.value })
+
+  const handleDownload = (file) => downloadFile(file).catch((error) => toast.error(error.message))
+
+  const handleClosePreview = () => {
+    URL.revokeObjectURL(opened.url)
+    setOpened(null)
+  }
 
   const handleDelete = async () => {
     if (await remove.run(toDelete.id)) {
@@ -46,7 +55,7 @@ function FilesPage() {
   }
 
   const handleExport = (format) =>
-    exportTable(format, { sheetName: 'Files', columns: FILE_COLUMNS, rows: visibleFiles, fileName: 'files' })
+    exportAllRows(fileService, filters, format, { sheetName: 'Files', columns: FILE_COLUMNS, fileName: 'files' })
 
   return (
     <div className="space-y-6">
@@ -66,7 +75,8 @@ function FilesPage() {
           ))}
         </Alert>
       )}
-      <Alert>{upload.error && 'Some files could not be uploaded. Please try again.'}</Alert>
+      <Alert>{upload.error && `Some files could not be uploaded. ${upload.error}`}</Alert>
+      <Alert>{open.error || list.error}</Alert>
 
       <section className="rounded-xl bg-surface shadow-sm">
         <div className="flex flex-wrap items-center gap-2 border-b border-gray-100 p-4">
@@ -78,10 +88,17 @@ function FilesPage() {
             <ExportMenu onExport={handleExport} />
           </div>
         </div>
-        <FilesTable files={visibleFiles} loading={loading} onOpen={setOpened} onDelete={setToDelete} />
+        <FilesTable
+          files={list.items}
+          loading={list.loading || open.loading}
+          onOpen={open.run}
+          onDownload={handleDownload}
+          onDelete={setToDelete}
+        />
+        <Pagination pagination={list.pagination} onPageChange={list.setPage} />
       </section>
 
-      {opened && <FilePreviewModal file={opened} onClose={() => setOpened(null)} />}
+      {opened && <FilePreviewModal file={opened} onClose={handleClosePreview} />}
 
       {toDelete && (
         <ConfirmModal

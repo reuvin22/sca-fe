@@ -1,9 +1,8 @@
-// Mock API. Replace with a real axios call when the backend is ready.
-import { delay } from '../utils/mockApi'
+import api from '../api/axios'
+import { SUPPORT_ROUTE } from '../api/routes'
 
 // `request`: { type: 'bug' | 'feature', subject, description, severity? }
 // `severity` ('low' | 'medium' | 'high' | 'critical') is only sent for bugs
 export async function sendSupportRequest(request) {
-  await delay()
-  return { ...request, id: crypto.randomUUID() }
+  return (await api.post(SUPPORT_ROUTE, request)).data
 }

@@ -1,0 +1,53 @@
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Navigate } from 'react-router-dom'
+import Alert from '../ui/Alert'
+import Skeleton from '../ui/Skeleton'
+import TextLink from '../ui/TextLink'
+import { getMe } from '../../services/authService'
+import { getCategories } from '../../services/categoryService'
+import { setProfile } from '../../store/authSlice'
+import { setCategories } from '../../store/optionsSlice'
+
+// Protects signed-in pages. Without a token it goes to /login.
+// After a page refresh it loads the profile and Settings categories before showing the page.
+function RequireAuth({ children }) {
+  const dispatch = useDispatch()
+  const { token, user } = useSelector((state) => state.auth)
+  const [error, setError] = useState('')
+  const signedIn = Boolean(token)
+
+  useEffect(() => {
+    if (!signedIn) return
+    Promise.all([getMe(), getCategories()])
+      .then(([profile, categories]) => {
+        dispatch(setProfile(profile))
+        dispatch(setCategories(categories))
+      })
+      .catch((err) => setError(err.message))
+  }, [signedIn, dispatch])
+
+  if (!signedIn) return <Navigate to="/login" replace />
+
+  if (error) {
+    return (
+      <div className="mx-auto mt-20 max-w-sm space-y-3 px-4 text-center">
+        <Alert>{error}</Alert>
+        <TextLink to="/login">Go to sign in</TextLink>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="space-y-4 p-6">
+        <Skeleton className="h-10 w-1/3" />
+        <Skeleton className="h-64" />
+      </div>
+    )
+  }
+
+  return children
+}
+
+export default RequireAuth

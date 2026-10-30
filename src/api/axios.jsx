@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getToken } from '../utils/authStorage'
+import { clearToken, getToken } from '../utils/authStorage'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -13,10 +13,17 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Returns the response `data` directly. Errors become a friendly message (never raw server errors).
+// Returns the response body: { data, pagination? } (or the Blob for downloads).
+// Errors become a friendly message (never raw server errors).
 api.interceptors.response.use(
-  (response) => response.data?.data,
+  (response) => response.data,
   (error) => {
+    // Expired or invalid login: sign out and go to the login page
+    if (error.response?.status === 401 && error.config.headers.Authorization) {
+      clearToken()
+      window.location.assign('/login')
+    }
+
     const message = error.response
       ? error.response.data?.message || 'Something went wrong. Please try again.'
       : 'Cannot reach the server. Please check your connection.'

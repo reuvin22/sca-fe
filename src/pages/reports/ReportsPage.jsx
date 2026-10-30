@@ -6,17 +6,12 @@ import MonthlyChartCard from '../../components/dashboard/MonthlyChartCard'
 import CountBarsCard from '../../components/reports/CountBarsCard'
 import WorkloadCard from '../../components/reports/WorkloadCard'
 import useFetch from '../../hooks/useFetch'
-import { getCases } from '../../services/caseService'
-import { getAppointments } from '../../services/appointmentService'
+import { getReportSummary } from '../../services/reportService'
 import { getReportData } from '../../utils/reportHelpers'
 
 function ReportsPage() {
-  const cases = useFetch(getCases)
-  const appointments = useFetch(getAppointments)
-  const loading = cases.loading || appointments.loading
-  const error = cases.error || appointments.error
-
-  const data = !loading && !error && getReportData(cases.data, appointments.data)
+  const { data: summary, loading, error } = useFetch(getReportSummary)
+  const data = summary && getReportData(summary)
 
   return (
     <div className="space-y-6">

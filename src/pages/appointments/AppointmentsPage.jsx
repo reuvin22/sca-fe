@@ -5,11 +5,12 @@ import AppointmentsTable from '../../components/appointments/AppointmentsTable'
 import AppointmentCalendar from '../../components/appointments/AppointmentCalendar'
 import AppointmentModal from '../../components/appointments/AppointmentModal'
 import Alert from '../../components/ui/Alert'
-import useCrud from '../../hooks/useCrud'
+import Pagination from '../../components/ui/Pagination'
+import usePaginatedList from '../../hooks/usePaginatedList'
 import useRequest from '../../hooks/useRequest'
 import { appointmentService } from '../../services/appointmentService'
-import { APPOINTMENT_COLUMNS, emptyAppointmentFilters, filterAppointments, moveAppointment } from '../../utils/appointmentHelpers'
-import { exportTable } from '../../utils/export/exportTable'
+import { APPOINTMENT_COLUMNS, emptyAppointmentFilters, moveAppointment } from '../../utils/appointmentHelpers'
+import { exportAllRows } from '../../utils/export/exportAllRows'
 
 const VIEWS = [
   { id: 'calendar', label: 'Calendar', icon: CalendarDays },
@@ -17,21 +18,25 @@ const VIEWS = [
 ]
 
 function AppointmentsPage() {
-  const { items: appointments, loading, saveItem, removeItem } = useCrud(appointmentService, 'Appointment')
-  const move = useRequest(saveItem)
   const [view, setView] = useState('calendar')
   const [filters, setFilters] = useState(emptyAppointmentFilters)
+  // The calendar needs every matching appointment; the table loads one page at a time
+  const list = usePaginatedList(appointmentService, 'Appointment', filters, { all: view === 'calendar' })
+  const move = useRequest(list.saveItem)
   // undefined = closed, null = add, object = edit
   const [selected, setSelected] = useState(undefined)
-  const visibleAppointments = filterAppointments(appointments, filters)
 
-  // Exports only the rows shown after filtering
+  // Exports every appointment that matches the filters
   const handleExport = (format) =>
-    exportTable(format, { sheetName: 'Appointments', columns: APPOINTMENT_COLUMNS, rows: visibleAppointments, fileName: 'appointments' })
+    exportAllRows(appointmentService, filters, format, {
+      sheetName: 'Appointments',
+      columns: APPOINTMENT_COLUMNS,
+      fileName: 'appointments',
+    })
 
   // Drag and drop on the calendar
   const handleMove = (id, date, time) => {
-    const moved = moveAppointment(appointments.find((item) => item.id === id), date, time)
+    const moved = moveAppointment(list.items.find((item) => item.id === id), date, time)
     if (moved) move.run(moved)
   }
 
@@ -57,24 +62,29 @@ function AppointmentsPage() {
         </div>
       </div>
 
-      <Alert>{move.error}</Alert>
+      <Alert>{move.error || list.error}</Alert>
 
       <section className="rounded-xl bg-surface shadow-sm">
         <div className="border-b border-gray-100 p-4">
           <AppointmentFilters filters={filters} onChange={setFilters} onAdd={() => setSelected(null)} onExport={handleExport} />
         </div>
         {view === 'calendar' && (
-          <AppointmentCalendar appointments={visibleAppointments} loading={loading} onSelect={setSelected} onMove={handleMove} />
+          <AppointmentCalendar appointments={list.items} loading={list.loading} onSelect={setSelected} onMove={handleMove} />
         )}
-        {view === 'table' && <AppointmentsTable appointments={visibleAppointments} loading={loading} onRowClick={setSelected} />}
+        {view === 'table' && (
+          <>
+            <AppointmentsTable appointments={list.items} loading={list.loading} onRowClick={setSelected} />
+            <Pagination pagination={list.pagination} onPageChange={list.setPage} />
+          </>
+        )}
       </section>
 
       {selected !== undefined && (
         <AppointmentModal
           key={selected?.id ?? 'new'}
           appointment={selected}
-          onSave={saveItem}
-          onDelete={removeItem}
+          onSave={list.saveItem}
+          onDelete={list.removeItem}
           onClose={() => setSelected(undefined)}
         />
       )}

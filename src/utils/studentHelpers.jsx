@@ -108,15 +108,3 @@ export const emptyStudentFilters = {
   to: '',
   ...Object.fromEntries(FILTER_IDS.map((id) => [id, ''])),
 }
-
-// No `to` means a single day (`from` only). Empty filters are ignored.
-export function filterStudents(students, filters) {
-  const keyword = filters.search.trim().toLowerCase()
-  const { from, to } = filters
-  return students.filter(
-    (item) =>
-      item.studentName.toLowerCase().includes(keyword) &&
-      (!from || (item.dateEncoded >= from && item.dateEncoded <= (to || from))) &&
-      FILTER_IDS.every((id) => !filters[id] || item[id] === filters[id]),
-  )
-}

@@ -7,6 +7,13 @@ export function validatePassword({ password, confirmPassword }) {
   return errors
 }
 
+export function validateLogin(form) {
+  const errors = {}
+  if (!isEmail(form.email)) errors.email = 'Enter a valid email.'
+  if (!form.password) errors.password = 'Password is required.'
+  return errors
+}
+
 export function validateCase(form) {
   const errors = {}
   if (!form.learnerName.trim()) errors.learnerName = 'Name of learner is required.'

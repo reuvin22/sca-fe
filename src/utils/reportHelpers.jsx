@@ -1,5 +1,4 @@
-import { countBy, percent } from './dashboardHelpers'
-import { getCaseStatus } from './caseHelpers'
+import { percent } from './dashboardHelpers'
 
 // Workload table and export columns
 export const WORKLOAD_COLUMNS = [
@@ -12,71 +11,46 @@ export const WORKLOAD_COLUMNS = [
 ]
 
 // Appointments per month, oldest first: [{ month: 'Oct 2026', count, color }]
-function appointmentsByMonth(appointments) {
-  return countBy(appointments.map((item) => ({ month: item.date.slice(0, 7) })), 'month')
-    .sort((a, b) => a.label.localeCompare(b.label))
-    .map(({ label, count }, i) => ({
-      month: new Date(`${label}-01T00:00`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-      count,
-      color: i % 2 ? 'bg-fuchsia-600' : 'bg-emerald-500',
-    }))
-}
+const toMonthBars = (months) =>
+  months.map(({ month, count }, i) => ({
+    month: new Date(`${month}-01T00:00`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+    count,
+    color: i % 2 ? 'bg-fuchsia-600' : 'bg-emerald-500',
+  }))
 
-// Appointment counts per assigned staff, busiest first
-function workloadByCounselor(appointments) {
-  const count = (items, status) => items.filter((item) => item.status === status).length
-  return countBy(appointments, 'staff').map(({ label }) => {
-    const items = appointments.filter((item) => item.staff === label)
-    return {
-      id: label,
-      staff: label,
-      total: items.length,
-      scheduled: count(items, 'scheduled'),
-      completed: count(items, 'completed'),
-      cancelled: count(items, 'cancelled'),
-      noShow: count(items, 'no-show'),
-    }
-  })
-}
-
-// All report data, built from the Cases and Appointments lists
-export function getReportData(cases, appointments) {
-  const completedCases = cases.filter((item) => getCaseStatus(item) === 'accomplished').length
-  const pendingCases = cases.length - completedCases
-  const withFollowUp = cases.filter((item) => item.followUpDate)
-  const followUpsDone = withFollowUp.filter((item) => getCaseStatus(item) === 'accomplished').length
-  // Only appointments that already happened (completed or no-show)
-  const noShows = appointments.filter((item) => item.status === 'no-show').length
-  const finished = noShows + appointments.filter((item) => item.status === 'completed').length
-  const referred = cases.filter((item) => item.referredTo && item.referredTo !== 'Not Referred')
+// All report data, built from GET /reports/summary
+export function getReportData({ cases, appointmentStatus, appointmentsByMonth, referrals, workload }) {
+  // Every case has a follow-up date, so follow-ups done = completed cases
+  // No-show rate only counts appointments that already happened (completed or no-show)
+  const finished = appointmentStatus.noShow + appointmentStatus.completed
 
   return {
     rates: [
       {
         label: 'Completed',
-        note: `${completedCases} completed · ${pendingCases} pending`,
-        value: percent(completedCases, cases.length),
+        note: `${cases.completed} completed · ${cases.pending} pending`,
+        value: percent(cases.completed, cases.total),
         color: 'stroke-emerald-500',
       },
       {
         label: 'Follow-ups',
-        note: `${followUpsDone} of ${withFollowUp.length} done`,
-        value: percent(followUpsDone, withFollowUp.length),
+        note: `${cases.completed} of ${cases.total} done`,
+        value: percent(cases.completed, cases.total),
         color: 'stroke-sky-400',
       },
       {
         label: 'No-show',
-        note: `${noShows} of ${finished} appointments`,
-        value: percent(noShows, finished),
+        note: `${appointmentStatus.noShow} of ${finished} appointments`,
+        value: percent(appointmentStatus.noShow, finished),
         color: 'stroke-red-500',
       },
     ],
     caseStatus: [
-      { label: 'Completed', count: completedCases },
-      { label: 'Pending', count: pendingCases },
+      { label: 'Completed', count: cases.completed },
+      { label: 'Pending', count: cases.pending },
     ],
-    appointmentsByMonth: appointmentsByMonth(appointments),
-    referrals: countBy(referred, 'referredTo'),
-    workload: workloadByCounselor(appointments),
+    appointmentsByMonth: toMonthBars(appointmentsByMonth),
+    referrals,
+    workload: workload.map((row) => ({ ...row, id: row.staff })),
   }
 }

@@ -6,7 +6,7 @@ import { FILE_COLUMNS, getFileKind } from '../../utils/fileHelpers'
 const ICON_BUTTON = 'cursor-pointer rounded-md p-1.5 text-gray-500 hover:bg-gray-100'
 
 // Clicking a row opens the file preview
-function FilesTable({ files, loading, onOpen, onDelete }) {
+function FilesTable({ files, loading, onOpen, onDownload, onDelete }) {
   // Screen-only styling and actions (not exported)
   const renders = {
     name: {
@@ -24,9 +24,9 @@ function FilesTable({ files, loading, onOpen, onDelete }) {
       render: (file) => (
         // Stops the click from also opening the preview
         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-          <a href={file.url} download={file.name} aria-label={`Download ${file.name}`} className={ICON_BUTTON}>
+          <button type="button" aria-label={`Download ${file.name}`} onClick={() => onDownload(file)} className={ICON_BUTTON}>
             <Download size={16} />
-          </a>
+          </button>
           <button type="button" aria-label={`Delete ${file.name}`} onClick={() => onDelete(file)} className={`${ICON_BUTTON} hover:text-red-600`}>
             <Trash2 size={16} />
           </button>

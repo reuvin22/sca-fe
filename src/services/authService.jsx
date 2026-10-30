@@ -1,40 +1,70 @@
-// Register and email confirmation use the backend. The rest are still mocks until connected.
+import { signInWithPopup, signOut } from 'firebase/auth'
 import api from '../api/axios'
-import { AUTH_ROUTES } from '../api/routes'
-import { saveToken } from '../utils/authStorage'
+import { firebaseAuth, googleProvider } from '../api/firebase'
+import { AUTH_ROUTES, PROFILE_ROUTE } from '../api/routes'
+import { clearToken, saveToken } from '../utils/authStorage'
 
-const delay = (ms = 800) => new Promise((resolve) => setTimeout(resolve, ms))
-
-// `data`: { fullName, email, password }. Sends the confirmation email.
-export function register({ fullName, email, password }) {
-  return api.post(AUTH_ROUTES.register, { fullName, email, password })
-}
-
-export function resendConfirmation(email) {
-  return api.post(AUTH_ROUTES.resendConfirmation, { email })
-}
-
-// Confirms the email from the private link and signs the user in.
-// Returns { token, profile }; save it to the store with signIn().
-export async function verifyEmail(token) {
-  if (!token) throw new Error('This confirmation link is invalid or has expired.')
-  const session = await api.post(AUTH_ROUTES.verifyEmail, { token })
+// Sign-in calls return { token, profile } and save the token. Put it in the store with signIn().
+async function startSession(request) {
+  const session = (await request).data
   saveToken(session.token)
   return session
 }
 
+export function login({ email, password }) {
+  return startSession(api.post(AUTH_ROUTES.login, { email, password }))
+}
+
+// Google sign-in runs in a Firebase popup. The backend checks the Google ID token.
+export async function loginWithGoogle() {
+  let idToken
+  try {
+    const result = await signInWithPopup(firebaseAuth, googleProvider)
+    idToken = await result.user.getIdToken()
+  } catch (error) {
+    // Closing the popup is not an error worth showing
+    if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') return null
+    throw new Error('Google sign-in failed. Please try again.', { cause: error })
+  }
+  return startSession(api.post(AUTH_ROUTES.google, { idToken }))
+}
+
+// Clears the saved token and the Google session (if any)
+export async function logout() {
+  clearToken()
+  await signOut(firebaseAuth).catch(() => {})
+}
+
+// { user, school } of the signed-in user
+export async function getMe() {
+  return (await api.get(AUTH_ROUTES.me)).data
+}
+
+// `data`: { fullName, email, password }. Sends the confirmation email.
+export async function register({ fullName, email, password }) {
+  return (await api.post(AUTH_ROUTES.register, { fullName, email, password })).data
+}
+
+export async function resendConfirmation(email) {
+  return (await api.post(AUTH_ROUTES.resendConfirmation, { email })).data
+}
+
+// Confirms the email from the private link and signs the user in.
+export async function verifyEmail(token) {
+  if (!token) throw new Error('This confirmation link is invalid or has expired.')
+  return startSession(api.post(AUTH_ROUTES.verifyEmail, { token }))
+}
+
 export async function forgotPassword(email) {
-  await delay()
-  return { email }
+  return (await api.post(AUTH_ROUTES.forgotPassword, { email })).data
 }
 
 export async function resetPassword(token, password) {
-  await delay()
-  if (!token || !password) throw new Error('This reset link is invalid or has expired.')
+  if (!token) throw new Error('This reset link is invalid or has expired.')
+  return (await api.post(AUTH_ROUTES.resetPassword, { token, password })).data
 }
 
-// `profile`: { user, school }
+// `profile`: { user, school }. Returns the saved profile.
 export async function updateProfile(profile) {
-  await delay()
-  return profile
+  return (await api.put(PROFILE_ROUTE, profile)).data
 }

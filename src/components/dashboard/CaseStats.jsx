@@ -1,6 +1,6 @@
 import { CalendarDays, CircleCheck, Clock, FolderOpen, Share2, TriangleAlert } from 'lucide-react'
 import StatCard from './StatCard'
-import { CASE_STAT_LABELS, getCaseStats } from '../../utils/caseHelpers'
+import { CASE_STAT_LABELS } from '../../utils/caseHelpers'
 
 const cards = [
   { key: 'total', icon: FolderOpen },
@@ -11,9 +11,8 @@ const cards = [
   { key: 'referrals', icon: Share2 },
 ]
 
-function CaseStats({ cases }) {
-  const stats = getCaseStats(cases)
-
+// `stats`: case totals from the backend ({ total, forFollowUp, overdue, closed, thisMonth, referrals })
+function CaseStats({ stats }) {
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 2xl:grid-cols-6">
       {cards.map(({ key, ...card }) => (

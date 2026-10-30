@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { getCases } from '../services/caseService'
-import { getAppointments } from '../services/appointmentService'
+import { getNotificationData } from '../services/reportService'
 import { getNotifications } from '../utils/notificationHelpers'
 
 // Notification list + read state. Reloads on every page change so edits show up.
@@ -12,8 +11,8 @@ function useNotifications() {
 
   useEffect(() => {
     let ignore = false
-    Promise.all([getCases(), getAppointments()])
-      .then(([cases, appointments]) => !ignore && setNotifications(getNotifications(cases, appointments)))
+    getNotificationData()
+      .then((data) => !ignore && setNotifications(getNotifications(data)))
       .catch(() => {}) // keep the last list if loading fails
     return () => {
       ignore = true

@@ -51,22 +51,6 @@ export function getCaseStatus(item) {
   return item.followUpDate ? getFollowUpStatus(item.followUpDate) : ''
 }
 
-// Totals for the dashboard summary cards
-export function getCaseStats(cases) {
-  const thisMonth = toDateString().slice(0, 7)
-  const count = (check) => cases.filter(check).length
-  const statusIs = (...statuses) => (item) => statuses.includes(getCaseStatus(item))
-
-  return {
-    total: cases.length,
-    forFollowUp: count(statusIs('today', 'scheduled')),
-    overdue: count(statusIs('overdue')),
-    closed: count(statusIs('accomplished')),
-    thisMonth: count((item) => item.intakeDate.startsWith(thisMonth)),
-    referrals: count((item) => item.referredTo && item.referredTo !== 'Not Referred'),
-  }
-}
-
 export const CASE_STAT_LABELS = {
   total: 'Total Cases',
   forFollowUp: 'For Follow-up',
@@ -74,15 +58,4 @@ export const CASE_STAT_LABELS = {
   closed: 'Closed / Resolved',
   thisMonth: 'This Month',
   referrals: 'Referrals',
-}
-
-// No `to` means a single day (`from` only).
-export function filterCases(cases, { search, from, to, status }) {
-  const keyword = search.trim().toLowerCase()
-  return cases.filter(
-    (item) =>
-      item.learnerName.toLowerCase().includes(keyword) &&
-      (!from || (item.intakeDate >= from && item.intakeDate <= (to || from))) &&
-      (!status || getCaseStatus(item) === status),
-  )
 }

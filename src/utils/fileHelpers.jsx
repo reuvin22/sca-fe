@@ -49,10 +49,3 @@ export const FILE_COLUMNS = [
 ]
 
 export const emptyFileFilters = { search: '', kind: '' }
-
-export function filterFiles(files, { search, kind }) {
-  const keyword = search.trim().toLowerCase()
-  return files.filter(
-    (file) => file.name.toLowerCase().includes(keyword) && (!kind || getFileKind(file.name).label === kind),
-  )
-}

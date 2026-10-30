@@ -1,79 +1,56 @@
 import { toDateString, toISO } from './dateHelpers'
-import { getCaseStats, getCaseStatus } from './caseHelpers'
 
 export const percent = (part, total) => (total ? Math.round((part / total) * 100) : 0)
 
-// Most common values of a field, highest first: [{ label, count }]
-export function countBy(cases, key, limit) {
-  const counts = {}
-  cases.forEach((item) => {
-    if (item[key]) counts[item[key]] = (counts[item[key]] ?? 0) + 1
-  })
-  return Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit)
-    .map(([label, count]) => ({ label, count }))
-}
+// Charts use one theme color (primary) so they follow Light, Dark and Custom
+const RING_COLOR = ['stroke-primary']
 
-// Cases per month (by intake date) for the last `total` months
-function casesPerMonth(cases, total = 6) {
+// Count for `key` in a backend list like [{ month: '2026-10', count }], or 0
+const countFor = (list, field, key) => list.find((item) => item[field] === key)?.count ?? 0
+
+// Cases per month (by intake date) for the last 6 months, including empty months
+function casesPerMonth(counts, total = 6) {
   const now = new Date()
   return Array.from({ length: total }, (_, i) => {
     const date = new Date(now.getFullYear(), now.getMonth() - (total - 1 - i), 1)
-    const month = toISO(date).slice(0, 7)
     return {
       month: date.toLocaleString('en-US', { month: 'short' }),
-      count: cases.filter((item) => item.intakeDate.startsWith(month)).length,
+      count: countFor(counts, 'month', toISO(date).slice(0, 7)),
       color: 'bg-primary',
     }
   })
 }
 
-// Cases per day (by intake date) for the last `total` days
-function casesPerDay(cases, total = 7) {
+// Cases per day (by intake date) for the last 7 days, including empty days
+function casesPerDay(counts, total = 7) {
   return Array.from({ length: total }, (_, i) => {
     const day = toDateString(i - (total - 1))
     return {
       label: new Date(`${day}T00:00`).toLocaleString('en-US', { weekday: 'short' }),
-      count: cases.filter((item) => item.intakeDate === day).length,
+      count: countFor(counts, 'date', day),
     }
   })
 }
 
-// Follow-ups from today onward that aren't accomplished, earliest first
-function upcomingFollowUps(cases, limit = 5) {
-  const today = toDateString()
-  return cases
-    .filter((item) => item.followUpDate >= today && getCaseStatus(item) !== 'accomplished')
-    .sort((a, b) => a.followUpDate.localeCompare(b.followUpDate))
-    .slice(0, limit)
-}
-
-// Charts use one theme color (primary) so they follow Light, Dark and Custom
-const RING_COLOR = ['stroke-primary']
-
-// All dashboard chart data, built from the Cases list
-export function getDashboardData(cases) {
-  const total = cases.length
-  const stats = getCaseStats(cases)
-  const toRings = (items, colors) =>
-    items.map((item, i) => ({ label: item.label, value: percent(item.count, total), color: colors[i % colors.length] }))
+// All dashboard chart data, built from GET /reports/dashboard
+export function getDashboardData(data) {
+  const { caseStats: stats } = data
+  const toRings = (items) =>
+    items.map((item, i) => ({ label: item.label, value: percent(item.count, stats.total), color: RING_COLOR[i % RING_COLOR.length] }))
 
   return {
+    stats,
     progress: [
-      { label: 'Resolved', note: 'Closed cases', value: percent(stats.closed, total), color: 'stroke-primary' },
-      { label: 'Pending', note: 'For follow-up', value: percent(stats.forFollowUp, total), color: 'stroke-primary' },
-      { label: 'Overdue', note: 'Past follow-up date', value: percent(stats.overdue, total), color: 'stroke-primary' },
+      { label: 'Resolved', note: 'Closed cases', value: percent(stats.closed, stats.total), color: 'stroke-primary' },
+      { label: 'Pending', note: 'For follow-up', value: percent(stats.forFollowUp, stats.total), color: 'stroke-primary' },
+      { label: 'Overdue', note: 'Past follow-up date', value: percent(stats.overdue, stats.total), color: 'stroke-primary' },
     ],
-    monthly: casesPerMonth(cases),
-    weekly: {
-      days: casesPerDay(cases),
-      rings: toRings(countBy(cases, 'classification', 3), RING_COLOR),
-    },
+    monthly: casesPerMonth(data.casesPerMonth),
+    weekly: { days: casesPerDay(data.casesPerDay), rings: toRings(data.classifications) },
     concerns: {
-      bars: countBy(cases, 'concern', 5).map((bar) => ({ ...bar, value: percent(bar.count, total) })),
-      rings: toRings(countBy(cases, 'gradeSection', 3), RING_COLOR),
+      bars: data.concerns.map((bar) => ({ ...bar, value: percent(bar.count, stats.total) })),
+      rings: toRings(data.gradeSections),
     },
-    upcoming: upcomingFollowUps(cases),
+    upcoming: data.upcomingFollowUps,
   }
 }

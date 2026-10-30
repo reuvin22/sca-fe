@@ -3,11 +3,20 @@ import { toast } from 'react-toastify'
 import Card from '../ui/Card'
 import AddInput from '../ui/AddInput'
 import CategoryCard from './CategoryCard'
+import { createCategory } from '../../services/categoryService'
 import { addCategory } from '../../store/optionsSlice'
 
 function CustomOptions() {
   const dispatch = useDispatch()
   const categories = useSelector((state) => state.options.categories)
+
+  const handleAdd = (name) =>
+    createCategory(name)
+      .then((saved) => {
+        dispatch(addCategory(saved))
+        toast.success(`${name} category added`)
+      })
+      .catch((error) => toast.error(error.message))
 
   return (
     <div className="space-y-6">
@@ -16,10 +25,7 @@ function CustomOptions() {
           id="category"
           items={categories.map((category) => category.name)}
           placeholder="e.g. Grade & Section"
-          onAdd={(name) => {
-            dispatch(addCategory(name))
-            toast.success(`${name} category added`)
-          }}
+          onAdd={handleAdd}
         />
       </Card>
 

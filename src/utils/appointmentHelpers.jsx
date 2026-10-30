@@ -73,17 +73,3 @@ export function moveAppointment(item, date, time) {
   if (!item || (item.date === date && item.time === time)) return null
   return applyReschedule(item, { ...item, date, time })
 }
-
-// Filters, then sorts by date and time (earliest first)
-export function filterAppointments(appointments, { search, from, to, status, staff }) {
-  const keyword = search.trim().toLowerCase()
-  return appointments
-    .filter(
-      (item) =>
-        item.studentName.toLowerCase().includes(keyword) &&
-        (!from || (item.date >= from && item.date <= (to || from))) &&
-        (!status || item.status === status) &&
-        (!staff || item.staff === staff),
-    )
-    .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))
-}

@@ -1,11 +1,11 @@
 import Select from '../ui/Select'
 import useFetch from '../../hooks/useFetch'
-import { getStudents } from '../../services/studentService'
+import { getStudentNames } from '../../services/studentService'
 
 // Dropdown of student names from the Students records
 function StudentSelect({ id, label = 'Student', value, onChange, error }) {
-  const { data: students, loading } = useFetch(getStudents)
-  const names = (students ?? []).map((student) => student.studentName)
+  const { data, loading } = useFetch(getStudentNames)
+  const names = [...new Set(data ?? [])]
 
   // Keep a saved name even if the student no longer exists
   if (value && !names.includes(value)) names.unshift(value)

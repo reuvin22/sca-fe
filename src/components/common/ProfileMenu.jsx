@@ -1,17 +1,25 @@
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { ChevronDown, LogOut, UserRound } from 'lucide-react'
 import Dropdown from '../ui/Dropdown'
+import { logout } from '../../services/authService'
+import { signOut } from '../../store/authSlice'
 import { getShortName } from '../../utils/stringHelpers'
 
 const itemClass = 'flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50'
 
 function ProfileMenu() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const user = useSelector((state) => state.auth.user)
 
-  // TODO: clear the session/token here once login is connected to the backend
-  const handleLogout = () => navigate('/login')
+  // Clears the saved token, the Google session and the signed-in user.
+  // Leaves the page first so nothing renders without a user.
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login', { replace: true })
+    dispatch(signOut())
+  }
 
   return (
     <Dropdown
