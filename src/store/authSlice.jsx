@@ -1,9 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { getToken } from '../utils/authStorage'
 
 const authSlice = createSlice({
   name: 'auth',
   // Mock signed-in user and school until login is connected to the backend
   initialState: {
+    token: getToken(),
     user: {
       fullName: 'ARVILEN A. DE GUZMAN',
       email: 'arvilen.deguzman@school.edu',
@@ -27,8 +29,15 @@ const authSlice = createSlice({
       state.user = action.payload.user
       state.school = action.payload.school
     },
+    // payload: { token, profile: { user, school } } from the backend
+    signIn: (state, action) => {
+      const { token, profile } = action.payload
+      state.token = token
+      state.user = profile.user
+      state.school = profile.school
+    },
   },
 })
 
-export const { setProfile } = authSlice.actions
+export const { setProfile, signIn } = authSlice.actions
 export default authSlice.reducer
