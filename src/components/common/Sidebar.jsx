@@ -26,7 +26,7 @@ const links = [
   { to: '/students', label: 'Students', icon: Users },
   { to: '/appointments', label: 'Appointments', icon: CalendarDays },
   { to: '/consultation', label: 'Consultation', icon: MessagesSquare },
-  { to: '/forms', label: 'Forms', icon: ClipboardList },
+  { to: '/documents', label: 'Documents', icon: ClipboardList },
   { to: '/files', label: 'Files', icon: FolderOpen },
   { to: '/todo', label: 'To Do', icon: ListTodo },
   { to: '/settings', label: 'Settings', icon: Settings },

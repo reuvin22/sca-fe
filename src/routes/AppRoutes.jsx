@@ -18,7 +18,9 @@ import DashboardPage from '../pages/dashboard/DashboardPage'
 import SettingsPage from '../pages/settings/SettingsPage'
 import CasesPage from '../pages/cases/CasesPage'
 import StudentsPage from '../pages/students/StudentsPage'
-import FormsPage from '../pages/forms/FormsPage'
+import DocumentsPage from '../pages/documents/DocumentsPage'
+// The PDF editor's libraries are large, so its page loads only when opened
+const PdfEditorPage = lazy(() => import('../pages/documents/PdfEditorPage'))
 import FormBuilderPage from '../pages/forms/FormBuilderPage'
 import PublicFormPage from '../pages/forms/PublicFormPage'
 import AppointmentsPage from '../pages/appointments/AppointmentsPage'
@@ -58,9 +60,19 @@ function AppRoutes() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/cases" element={<CasesPage />} />
         <Route path="/students" element={<StudentsPage />} />
-        <Route path="/forms" element={<FormsPage />} />
-        <Route path="/forms/new" element={<FormBuilderPage />} />
-        <Route path="/forms/:id/edit" element={<FormBuilderPage />} />
+        <Route path="/documents" element={<DocumentsPage />} />
+        <Route path="/documents/forms/new" element={<FormBuilderPage />} />
+        <Route path="/documents/forms/:id/edit" element={<FormBuilderPage />} />
+        {/* One route for /documents/pdf/new and /documents/pdf/:id, so saving a new one keeps the editor open */}
+        <Route
+          path="/documents/pdf/:id"
+          element={
+            <Suspense fallback={<Skeleton className="h-[70vh] rounded-xl" />}>
+              <PdfEditorPage />
+            </Suspense>
+          }
+        />
+        <Route path="/forms" element={<Navigate to="/documents" replace />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/consultation" element={<ConsultationPage />} />
         <Route path="/reports" element={<ReportsPage />} />

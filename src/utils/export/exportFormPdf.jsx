@@ -164,3 +164,8 @@ export async function exportFormPdf(form, fileName) {
 export async function formPdfUrl(form) {
   return URL.createObjectURL((await buildFormPdf(form)).output('blob'))
 }
+
+// The printable form as a Blob (e.g. to preview a template)
+export async function formPdfBlob(form) {
+  return (await buildFormPdf(form)).output('blob')
+}

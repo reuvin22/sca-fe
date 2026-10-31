@@ -34,3 +34,13 @@ export async function submitFormAnswers(code, answers) {
 
 // Full address of a public answer link
 export const formLinkUrl = (code) => `${window.location.origin}/f/${code}`
+
+// Unfinished work kept when the user leaves the builder. New form (no id): created as a draft.
+export async function saveFormDraft(id, data) {
+  return id
+    ? (await api.put(`${FORMS_ROUTE}/${id}/draft`, data)).data
+    : (await api.post(`${FORMS_ROUTE}/drafts`, data)).data
+}
+
+// Drops the unsaved changes of a saved form
+export const discardFormChanges = (id) => api.delete(`${FORMS_ROUTE}/${id}/draft`)

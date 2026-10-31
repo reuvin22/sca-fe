@@ -1,17 +1,25 @@
 import { Eye, FileSearch, Link2, Pencil, Trash2 } from 'lucide-react'
 import ExportMenu from '../common/ExportMenu'
+import Badge from '../ui/Badge'
 import { formatDate } from '../../utils/dateHelpers'
 import { FORM_EXPORT_FORMATS, exportForm } from '../../utils/export/exportForm'
 
-const iconButton = 'cursor-pointer rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800'
+const iconButton =
+  'cursor-pointer rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-40'
 
-// One form: title, description, dates, Export (PDF / Word), and Preview / Edit / Answer link / Responses / Delete buttons
+// One form: title, description, dates, Export (PDF / Word), and Preview / Edit / Answer link / Responses / Delete buttons.
+// Drafts (left before they were saved) show a badge and can't be shared until saved.
 function FormCard({ form, onPreview, onShare, onEdit, onViewResponses, onDelete }) {
   const count = form.questions.filter((question) => question.type !== 'section').length
+  const title = form.title || 'Untitled form'
 
   return (
     <article className="flex flex-col rounded-xl border border-gray-100 bg-surface p-5 shadow-sm">
-      <h3 className="font-semibold wrap-break-word text-gray-900">{form.title}</h3>
+      <div className="flex flex-wrap items-center gap-2">
+        <h3 className="font-semibold wrap-break-word text-gray-900">{title}</h3>
+        {form.draft && <Badge label="Draft" className="bg-amber-100 text-amber-700" />}
+        {form.hasPendingChanges && <Badge label="Unsaved changes" className="bg-amber-100 text-amber-700" />}
+      </div>
       <p className="mt-1 line-clamp-3 flex-1 text-sm wrap-break-word text-gray-500">
         {form.description || 'No description.'}
       </p>
@@ -44,9 +52,10 @@ function FormCard({ form, onPreview, onShare, onEdit, onViewResponses, onDelete 
           <button
             type="button"
             onClick={() => onShare(form)}
+            disabled={form.draft}
             className={iconButton}
-            aria-label={`Answer link for ${form.title}`}
-            title="Answer link"
+            aria-label={`Answer link for ${title}`}
+            title={form.draft ? 'Save the form to share it' : 'Answer link'}
           >
             <Link2 size={16} />
           </button>

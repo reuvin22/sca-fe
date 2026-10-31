@@ -7,6 +7,7 @@ import ImportFormButton from '../../components/forms/ImportFormButton'
 import FormResponsesModal from '../../components/forms/FormResponsesModal'
 import FormPreviewModal from '../../components/forms/FormPreviewModal'
 import ShareLinkModal from '../../components/forms/ShareLinkModal'
+import FormTemplateGallery from '../../components/forms/FormTemplateGallery'
 import Alert from '../../components/ui/Alert'
 import Button from '../../components/ui/Button'
 import ConfirmModal from '../../components/ui/ConfirmModal'
@@ -23,14 +24,18 @@ function FormsPage() {
   const navigate = useNavigate()
   const [viewing, setViewing] = useState(null)
   const [previewing, setPreviewing] = useState(null)
+  const [choosing, setChoosing] = useState(false)
   const [sharing, setSharing] = useState(null)
   const [toDelete, setToDelete] = useState(null)
   const remove = useRequest(list.removeItem)
 
   // Opens Create Form already filled with the imported form (saved only when the user clicks Save)
+  // New form: blank, or from a template (opens the builder already filled in)
+  const handleStart = (form) => navigate('/documents/forms/new', form ? { state: { imported: form } } : undefined)
+
   const handleImported = ({ form, exact }) => {
     if (!exact) toast.info('Form imported. Please check each field before saving.')
-    navigate('/forms/new', { state: { imported: form } })
+    navigate('/documents/forms/new', { state: { imported: form } })
   }
 
   const handleDelete = async () => {
@@ -39,14 +44,11 @@ function FormsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Forms</h1>
-          <p className="text-sm text-gray-500">Create forms and see their responses.</p>
-        </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-gray-500">Create forms, share answer links and see their responses.</p>
         <div className="flex gap-2">
           <ImportFormButton onImported={handleImported} />
-          <Button fullWidth={false} onClick={() => navigate('/forms/new')}>
+          <Button fullWidth={false} onClick={() => setChoosing(true)}>
             <Plus size={16} />
             Add Form
           </Button>
@@ -84,7 +86,7 @@ function FormsPage() {
               form={form}
               onPreview={setPreviewing}
               onShare={setSharing}
-              onEdit={(form) => navigate(`/forms/${form.id}/edit`)}
+              onEdit={(form) => navigate(`/documents/forms/${form.id}/edit`)}
               onViewResponses={setViewing}
               onDelete={setToDelete}
             />
@@ -93,6 +95,7 @@ function FormsPage() {
       )}
       <Pagination pagination={list.pagination} onPageChange={list.setPage} />
 
+      {choosing && <FormTemplateGallery onStart={handleStart} onClose={() => setChoosing(false)} />}
       {sharing && <ShareLinkModal formItem={sharing} onClose={() => setSharing(null)} />}
       {previewing && <FormPreviewModal form={previewing} onClose={() => setPreviewing(null)} />}
       {viewing && <FormResponsesModal formItem={viewing} onClose={() => setViewing(null)} />}
