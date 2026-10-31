@@ -45,13 +45,14 @@ function PdfPagesView({ load, title = 'Document' }) {
   if (error) return <Alert>{error}</Alert>
   if (!pages) {
     return (
-      <div className="flex h-[70vh] items-center justify-center rounded-lg bg-gray-100">
+      <div className="flex h-[65vh] items-center justify-center rounded-lg bg-gray-100 sm:h-[70vh]">
         <LoaderCircle size={24} className="animate-spin text-gray-400" />
       </div>
     )
   }
   return (
-    <div className="h-[70vh] space-y-4 overflow-y-auto rounded-lg bg-gray-100 p-3 sm:p-6">
+    // Phones: almost no padding so the page is as wide as the screen allows
+    <div className="h-[65vh] space-y-3 overflow-y-auto overscroll-contain rounded-lg bg-gray-100 p-1.5 sm:h-[70vh] sm:space-y-4 sm:p-6">
       {pages.map((page, i) => (
         <img
           key={i}
@@ -59,7 +60,7 @@ function PdfPagesView({ load, title = 'Document' }) {
           width={page.width}
           height={page.height}
           alt={`${title}, page ${i + 1} of ${pages.length}`}
-          className="mx-auto h-auto w-full max-w-3xl bg-white shadow-md"
+          className="mx-auto block h-auto w-full max-w-3xl bg-white shadow-md"
         />
       ))}
     </div>

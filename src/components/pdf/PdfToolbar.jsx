@@ -12,6 +12,10 @@ import {
   AlignRight,
   ArrowDownToLine,
   ArrowUpToLine,
+  BringToFront,
+  Lock,
+  LockOpen,
+  SendToBack,
   Bold,
   Circle,
   Copy,
@@ -50,6 +54,14 @@ const iconButton = (on) =>
   `flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg transition disabled:cursor-not-allowed disabled:opacity-30 ${
     on ? 'bg-brand-600 text-white' : 'text-gray-600 hover:bg-gray-100'
   }`
+// Layer order of the selected object, like Word's "Bring to front" / "Send behind text"
+const LAYERS = [
+  { where: 'front', label: 'Bring to front', icon: BringToFront },
+  { where: 'forward', label: 'Bring forward', icon: ArrowUpToLine },
+  { where: 'backward', label: 'Send backward', icon: ArrowDownToLine },
+  { where: 'back', label: 'Send to back (behind text)', icon: SendToBack },
+]
+
 // Align the selected object to the page
 const ALIGN = [
   { where: 'left', label: 'Align to page left', icon: AlignStartVertical },
@@ -81,6 +93,7 @@ function ColorInput({ label, value, onChange }) {
 function PdfToolbar({ editor }) {
   const imageInput = useRef(null)
   const { tool, style, changeStyle, selected } = editor
+  const locked = Boolean(selected?.lockMovementX)
   const isText = tool === 'text' || tool === 'paragraph' || selected?.type === 'i-text' || selected?.type === 'textbox'
   const isPen = tool === 'pen'
   const isShape =
@@ -154,25 +167,29 @@ function PdfToolbar({ editor }) {
         >
           <Copy size={18} />
         </button>
+        {LAYERS.map(({ where, label, icon: Icon }) => (
+          <button
+            key={where}
+            type="button"
+            title={label}
+            aria-label={label}
+            disabled={!selected}
+            onClick={() => editor.moveLayer(where)}
+            className={iconButton(false)}
+          >
+            <Icon size={18} />
+          </button>
+        ))}
         <button
           type="button"
-          title="Bring forward"
-          aria-label="Bring forward"
+          title={locked ? 'Unlock (can move again)' : 'Lock in place'}
+          aria-label={locked ? 'Unlock' : 'Lock in place'}
+          aria-pressed={locked}
           disabled={!selected}
-          onClick={() => editor.moveLayer(true)}
-          className={iconButton(false)}
+          onClick={editor.toggleLock}
+          className={iconButton(locked)}
         >
-          <ArrowUpToLine size={18} />
-        </button>
-        <button
-          type="button"
-          title="Send backward"
-          aria-label="Send backward"
-          disabled={!selected}
-          onClick={() => editor.moveLayer(false)}
-          className={iconButton(false)}
-        >
-          <ArrowDownToLine size={18} />
+          {locked ? <Lock size={18} /> : <LockOpen size={18} />}
         </button>
         <button
           type="button"

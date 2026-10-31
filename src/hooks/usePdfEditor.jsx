@@ -16,6 +16,9 @@ import {
 // State of the PDF editor. Each page has its own Fabric canvas (registered by PdfPageCanvas);
 // `canvases` maps page key → canvas. Undo/redo keeps snapshots of the page that changed.
 // `dirty`: there are changes not yet saved to Document Storage (kept as a draft when leaving).
+// A locked object can't be moved, resized or rotated by accident (e.g. a background logo)
+const LOCK_PROPS = ['lockMovementX', 'lockMovementY', 'lockScalingX', 'lockScalingY', 'lockRotation', 'hasControls']
+
 function usePdfEditor() {
   const [doc, setDoc] = useState(null) // { id (once stored), name, bytes, pages }
   const [dirty, setDirty] = useState(false)
@@ -24,13 +27,15 @@ function usePdfEditor() {
   const [style, setStyle] = useState(DEFAULT_STYLE)
   const [zoom, setZoom] = useState(1.25)
   const [selected, setSelected] = useState(null) // the selected object, if any
+  const [, setLockChanges] = useState(0) // redraws the toolbar after locking / unlocking
   const [history, setHistory] = useState({ undo: [], redo: [] })
   const canvases = useRef(new Map())
   const snapshots = useRef(new Map()) // page key → last saved snapshot
   const restoring = useRef(false)
 
   const activeCanvas = () => canvases.current.get(activeKey)
-  const snapshot = (canvas) => canvas.getObjects().map((object) => object.toObject())
+  // Locked objects keep their lock in undo / redo and when the document is stored
+  const snapshot = (canvas) => canvas.getObjects().map((object) => object.toObject(LOCK_PROPS))
 
   const reset = (next, changed = false) => {
     setDirty(changed)
@@ -276,13 +281,36 @@ function usePdfEditor() {
     return true
   }
 
-  const moveLayer = (up) => {
+  // Layers, like Word: 'front' (on top of everything), 'forward' / 'backward' (one step),
+  // 'back' (behind every other object, e.g. a logo behind the text)
+  const moveLayer = (where) => {
     const canvas = activeCanvas()
     const object = canvas?.getActiveObject()
     if (!object) return
-    if (up) canvas.bringObjectForward(object)
-    else canvas.sendObjectBackwards(object)
+    if (where === 'front') canvas.bringObjectToFront(object)
+    else if (where === 'forward') canvas.bringObjectForward(object)
+    else if (where === 'backward') canvas.sendObjectBackwards(object)
+    else canvas.sendObjectToBack(object)
     canvas.requestRenderAll()
+    recordChange(activeKey)
+  }
+
+  // Locks / unlocks the selected object in place (it can still be selected, to unlock or delete it)
+  const toggleLock = () => {
+    const canvas = activeCanvas()
+    const object = canvas?.getActiveObject()
+    if (!object) return
+    const lock = !object.lockMovementX
+    object.set({
+      lockMovementX: lock,
+      lockMovementY: lock,
+      lockScalingX: lock,
+      lockScalingY: lock,
+      lockRotation: lock,
+      hasControls: !lock,
+    })
+    canvas.requestRenderAll()
+    setLockChanges((count) => count + 1) // the toolbar shows the new state
     recordChange(activeKey)
   }
 
@@ -329,6 +357,7 @@ function usePdfEditor() {
     deleteSelected,
     duplicateSelected,
     moveLayer,
+    toggleLock,
     alignSelected,
     nudgeSelected,
     exportBlob,
