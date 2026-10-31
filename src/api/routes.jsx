@@ -21,6 +21,8 @@ export const PROFILE_ROUTE = '/profile'
 export const PROFILE_PHOTO_ROUTE = '/profile/photo'
 export const ACTIVITY_ROUTE = '/profile/activity'
 export const STUDENTS_ROUTE = '/students'
+export const FORMS_ROUTE = '/forms'
+export const PUBLIC_FORMS_ROUTE = '/public/forms'
 export const CASES_ROUTE = '/cases'
 export const APPOINTMENTS_ROUTE = '/appointments'
 export const CATEGORIES_ROUTE = '/categories'
@@ -34,5 +36,6 @@ export const UPDATES_ROUTE = '/updates'
 export const REPORT_ROUTES = {
   dashboard: '/reports/dashboard',
   summary: '/reports/summary',
+  period: '/reports/period',
   notifications: '/reports/notifications',
 }

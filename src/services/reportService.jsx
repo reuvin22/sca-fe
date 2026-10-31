@@ -11,6 +11,11 @@ export async function getReportSummary() {
   return (await api.get(REPORT_ROUTES.summary)).data
 }
 
+// Monthly (year + month) or annual (year only) report (see utils/periodReportHelpers)
+export async function getPeriodReport({ year, month }) {
+  return (await api.get(REPORT_ROUTES.period, { params: { year, month: month || undefined } })).data
+}
+
 // { overdue, dueToday, upcomingAppointments } (see utils/notificationHelpers)
 export async function getNotificationData() {
   return (await api.get(REPORT_ROUTES.notifications)).data

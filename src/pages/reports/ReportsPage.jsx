@@ -5,6 +5,7 @@ import ProgressCard from '../../components/dashboard/ProgressCard'
 import MonthlyChartCard from '../../components/dashboard/MonthlyChartCard'
 import CountBarsCard from '../../components/reports/CountBarsCard'
 import WorkloadCard from '../../components/reports/WorkloadCard'
+import PeriodReport from '../../components/reports/PeriodReport'
 import useFetch from '../../hooks/useFetch'
 import { getReportSummary } from '../../services/reportService'
 import { getReportData } from '../../utils/reportHelpers'
@@ -41,6 +42,8 @@ function ReportsPage() {
           <WorkloadCard rows={data.workload} />
         </>
       )}
+
+      <PeriodReport />
     </div>
   )
 }

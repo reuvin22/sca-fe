@@ -1,15 +1,19 @@
 import { useState } from 'react'
-import { Download, FileSpreadsheet, FileText, Sheet } from 'lucide-react'
+import { Download, FileSpreadsheet, FileText, FileType, Sheet } from 'lucide-react'
 import Button from '../ui/Button'
 
-const formats = [
+const FORMATS = [
   { value: 'pdf', label: 'PDF', icon: FileText },
+  { value: 'word', label: 'Word (.docx)', icon: FileType },
   { value: 'excel', label: 'Excel (.xlsx)', icon: FileSpreadsheet },
   { value: 'csv', label: 'CSV', icon: Sheet },
 ]
+const TABLE_FORMATS = ['pdf', 'excel', 'csv']
 
 // Export button with a format menu. `onExport(format)` may be async.
-function ExportMenu({ onExport, disabled }) {
+// `only` picks the formats shown (tables: PDF, Excel, CSV; forms: PDF, Word).
+function ExportMenu({ onExport, disabled, only = TABLE_FORMATS }) {
+  const formats = FORMATS.filter((format) => only.includes(format.value))
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 

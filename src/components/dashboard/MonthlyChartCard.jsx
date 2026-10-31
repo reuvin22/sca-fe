@@ -4,11 +4,12 @@ import Card from '../ui/Card'
 const MAX_DASHES = 10
 
 // Each bar is a stack of dashes, scaled so the busiest month has MAX_DASHES.
-function MonthlyChartCard({ months, title = 'Monthly Cases' }) {
+// `action` replaces the header icon (e.g. a filter).
+function MonthlyChartCard({ months, title = 'Monthly Cases', action }) {
   const max = Math.max(...months.map((item) => item.count), 1)
 
   return (
-    <Card title={title} icon={LayoutGrid}>
+    <Card title={title} icon={LayoutGrid} action={action}>
       <div className="flex h-44 items-end justify-between gap-3">
         {months.map(({ month, count, color }) => (
           <div key={month} className="flex flex-1 flex-col items-center gap-2">

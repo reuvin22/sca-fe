@@ -26,7 +26,7 @@ const ACTION_LABELS = {
   'role-added': 'Joined the developer team',
 }
 
-const ENTITY_LABELS = { student: 'Student', case: 'Case', appointment: 'Appointment', file: 'File', account: 'Account' }
+const ENTITY_LABELS = { student: 'Student', case: 'Case', appointment: 'Appointment', file: 'File', form: 'Form', account: 'Account' }
 
 // "Jun 03, 2026 · 9:05 AM" in the user's time zone
 function formatWhen(iso) {

@@ -2,7 +2,7 @@ import { getRedirectResult, signInWithPopup, signInWithRedirect, signOut } from 
 import api from '../api/axios'
 import { firebaseAuth, googleProvider, googleSignInByRedirect } from '../api/firebase'
 import { AUTH_ROUTES, PROFILE_PHOTO_ROUTE, PROFILE_ROUTE } from '../api/routes'
-import { clearToken, getToken, saveToken } from '../utils/authStorage'
+import { clearToken, getDeviceToken, getToken, saveDeviceToken, saveToken } from '../utils/authStorage'
 
 // Sign-in calls return { token, profile } and save the token. Put it in the store with signIn().
 async function startSession(request) {
@@ -12,14 +12,21 @@ async function startSession(request) {
 }
 
 // Password sign-in, step 1: checks the password and emails a 6-digit code.
-// Returns { codeRequired, challenge, email (masked) } for step 2.
+// Returns { codeRequired, challenge, email (masked) } for step 2, or { token, profile } (token saved)
+// when this browser entered a code in the last day.
 export async function login({ email, password }) {
-  return (await api.post(AUTH_ROUTES.login, { email, password })).data
+  const deviceToken = getDeviceToken() || undefined
+  const result = (await api.post(AUTH_ROUTES.login, { email, password, deviceToken })).data
+  if (result.token) saveToken(result.token)
+  return result
 }
 
-// Step 2: the code from the email. Returns { token, profile } and saves the token.
-export function verifyLoginCode({ challenge, code }) {
-  return startSession(api.post(AUTH_ROUTES.loginVerify, { challenge, code }))
+// Step 2: the code from the email. Returns { token, profile } and saves the token,
+// and remembers this browser for 1 day.
+export async function verifyLoginCode({ challenge, code }) {
+  const session = await startSession(api.post(AUTH_ROUTES.loginVerify, { challenge, code }))
+  if (session.deviceToken) saveDeviceToken(session.deviceToken)
+  return session
 }
 
 // Emails a new code for the same sign-in
@@ -85,7 +92,6 @@ export async function logoutEverywhere() {
   clearToken()
   await signOut(firebaseAuth).catch(() => {})
 }
-
 
 // { user, school } of the signed-in user
 export async function getMe() {

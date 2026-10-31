@@ -52,7 +52,9 @@ function LoginPage() {
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
     const result = await emailLogin.run(form)
+    // Code needed, or signed in right away on a device remembered from the last day
     if (result?.codeRequired) setPending(result)
+    else finishSignIn(result)
   }
 
   const handleGoogle = async () => finishSignIn(await googleLogin.run())
@@ -92,8 +94,24 @@ function LoginPage() {
             </TextLink>
           </p>
         )}
-        <Input label="Email" id="email" type="email" placeholder="you@school.edu" value={form.email} onChange={handleChange} error={errors.email} />
-        <Input label="Password" id="password" type="password" placeholder="••••••••" value={form.password} onChange={handleChange} error={errors.password} />
+        <Input
+          label="Email"
+          id="email"
+          type="email"
+          placeholder="you@school.edu"
+          value={form.email}
+          onChange={handleChange}
+          error={errors.email}
+        />
+        <Input
+          label="Password"
+          id="password"
+          type="password"
+          placeholder="••••••••"
+          value={form.password}
+          onChange={handleChange}
+          error={errors.password}
+        />
 
         <div className="text-right">
           <Link to="/forgot-password" className="text-sm text-gray-600 hover:text-gray-900">

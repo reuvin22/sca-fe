@@ -3,7 +3,7 @@ import { toast } from 'react-toastify'
 import Alert from '../../components/ui/Alert'
 import CaseStats from '../../components/dashboard/CaseStats'
 import ProgressCard from '../../components/dashboard/ProgressCard'
-import MonthlyChartCard from '../../components/dashboard/MonthlyChartCard'
+import CaseChartCard from '../../components/dashboard/CaseChartCard'
 import AreaChartCard from '../../components/dashboard/AreaChartCard'
 import BarListCard from '../../components/dashboard/BarListCard'
 import CalendarCard from '../../components/dashboard/CalendarCard'
@@ -47,7 +47,7 @@ function DashboardPage() {
 
         <div className="grid gap-6 lg:grid-cols-2">
           <ProgressCard items={dashboard.progress} />
-          <MonthlyChartCard months={dashboard.monthly} />
+          <CaseChartCard {...dashboard.cases} />
           <AreaChartCard {...dashboard.weekly} />
           <BarListCard {...dashboard.concerns} />
         </div>

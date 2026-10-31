@@ -14,10 +14,18 @@ function casesPerMonth(counts, total = 6) {
   return Array.from({ length: total }, (_, i) => {
     const date = new Date(now.getFullYear(), now.getMonth() - (total - 1 - i), 1)
     return {
-      month: date.toLocaleString('en-US', { month: 'short' }),
+      label: date.toLocaleString('en-US', { month: 'short' }),
       count: countFor(counts, 'month', toISO(date).slice(0, 7)),
-      color: 'bg-primary',
     }
+  })
+}
+
+// Cases per year (by intake date) for the last 5 years, including empty years
+function casesPerYear(counts, total = 5) {
+  const thisYear = new Date().getFullYear()
+  return Array.from({ length: total }, (_, i) => {
+    const year = String(thisYear - (total - 1 - i))
+    return { label: year, count: countFor(counts, 'year', year) }
   })
 }
 
@@ -45,7 +53,14 @@ export function getDashboardData(data) {
       { label: 'Pending', note: 'For follow-up', value: percent(stats.forFollowUp, stats.total), color: 'stroke-primary' },
       { label: 'Overdue', note: 'Past follow-up date', value: percent(stats.overdue, stats.total), color: 'stroke-primary' },
     ],
-    monthly: casesPerMonth(data.casesPerMonth),
+    // Cases chart: one series per filter (Weekly / Monthly / Annual)
+    cases: {
+      series: {
+        weekly: casesPerDay(data.casesPerDay),
+        monthly: casesPerMonth(data.casesPerMonth),
+        annual: casesPerYear(data.casesPerYear ?? []),
+      },
+    },
     weekly: { days: casesPerDay(data.casesPerDay), rings: toRings(data.classifications) },
     concerns: {
       bars: data.concerns.map((bar) => ({ ...bar, value: percent(bar.count, stats.total) })),
