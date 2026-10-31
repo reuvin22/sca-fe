@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import useDataVersion from './useDataVersion'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { subscribeToEvents } from '../api/realtime'
@@ -6,10 +7,13 @@ import { markNotificationsRead } from '../services/notificationService'
 import { getNotificationData } from '../services/reportService'
 import { getNotifications, toUpdateNotification } from '../utils/notificationHelpers'
 
+const NOTIFICATION_TAGS = ['reports', 'updates', 'notifications']
 // Unread notifications for the bell. Read ones are saved on the server (per user) and hidden,
 // so they stay gone after a reload. Reloads on every page change so edits show up,
 // and receives new system updates in real time (no refresh needed).
 function useNotifications() {
+  // Cases, appointments or updates changed, or refresh: reload the bell (utils/dataSync)
+  const synced = useDataVersion(NOTIFICATION_TAGS)
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const [notifications, setNotifications] = useState([])
@@ -40,7 +44,7 @@ function useNotifications() {
     return () => {
       ignore = true
     }
-  }, [pathname])
+  }, [pathname, synced])
 
   const isRead = (item) => item.read || readIds.includes(item.id)
   const unread = notifications.filter((item) => !isRead(item))

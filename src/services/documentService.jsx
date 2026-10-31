@@ -16,6 +16,7 @@ function toFormData({ name, draft, project, source }) {
 
 // Document Storage (PDFs made in the PDF editor). Used by usePaginatedList: { list, listAll, remove }.
 export const documentService = {
+  tags: ['documents'],
   list: (filters, page) => fetchPage(DOCUMENTS_ROUTE, filters, page),
   listAll: (filters) => fetchAllPages(DOCUMENTS_ROUTE, filters),
   remove: (id) => api.delete(`${DOCUMENTS_ROUTE}/${id}`),

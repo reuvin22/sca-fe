@@ -9,6 +9,8 @@ import { getUpdate, getUpdateMediaUrl, markUpdateRead } from '../../services/upd
 import { formatDate, formatTime } from '../../utils/dateHelpers'
 import { RICH_TEXT } from '../../utils/styles'
 
+const UPDATE_TAGS = ['updates'] // reload when updates change (utils/dataSync)
+
 const TYPE_LABEL = { bug: 'Bug fix', feature: 'New feature' }
 
 // A published system update. Opened from a notification (not in the menu).
@@ -16,7 +18,7 @@ function UpdateDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const loadUpdate = useCallback(() => getUpdate(id), [id])
-  const { data: update, loading, error } = useFetch(loadUpdate)
+  const { data: update, loading, error } = useFetch(loadUpdate, UPDATE_TAGS)
   const loadMedia = useCallback((index) => getUpdateMediaUrl(id, index), [id])
 
   // Opening the update marks its notification as read
@@ -28,7 +30,11 @@ function UpdateDetailPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <button type="button" onClick={() => navigate(-1)} className="flex cursor-pointer items-center gap-1 text-sm text-gray-500 hover:text-gray-900">
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="flex cursor-pointer items-center gap-1 text-sm text-gray-500 hover:text-gray-900"
+      >
         <ArrowLeft size={16} />
         Back
       </button>
@@ -53,7 +59,9 @@ function UpdateDetailPage() {
             <h1 className="text-2xl font-bold wrap-break-word text-gray-900">{update.title}</h1>
             <p className="text-sm text-gray-500">
               By {update.authorName} · {formatDate(update.publishedAt.slice(0, 10))} at{' '}
-              {formatTime(`${String(published.getHours()).padStart(2, '0')}:${String(published.getMinutes()).padStart(2, '0')}`)}
+              {formatTime(
+                `${String(published.getHours()).padStart(2, '0')}:${String(published.getMinutes()).padStart(2, '0')}`,
+              )}
             </p>
           </header>
 

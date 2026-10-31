@@ -44,7 +44,10 @@ function MediaPicker({ files, onChange, disabled }) {
       {files.length > 0 && (
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {files.map((file, i) => (
-            <li key={`${file.name}-${i}`} className="relative overflow-hidden rounded-lg border border-gray-200 bg-black">
+            <li
+              key={`${file.name}-${i}`}
+              className="relative overflow-hidden rounded-lg border border-gray-200 bg-black"
+            >
               {getMediaKind(file.name) === 'video' ? (
                 <video src={previews[i]} muted className="aspect-video w-full object-cover" />
               ) : (

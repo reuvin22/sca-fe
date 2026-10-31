@@ -1,4 +1,5 @@
 import api from '../api/axios'
+import { tagsForUrl } from './dataSync'
 
 // Drops empty filters so the URL only has the ones in use
 export const cleanParams = (params) => Object.fromEntries(Object.entries(params).filter(([, value]) => value !== ''))
@@ -19,9 +20,10 @@ export async function fetchAllPages(path, filters = {}) {
   return [first, ...rest].flatMap((result) => result.items)
 }
 
-// CRUD service for a list endpoint. Used by usePaginatedList.
+// CRUD service for a list endpoint. Used by usePaginatedList. `tags`: what to watch for changes (utils/dataSync).
 export function createListService(path) {
   return {
+    tags: tagsForUrl(path),
     list: (filters, page) => fetchPage(path, filters, page),
     listAll: (filters) => fetchAllPages(path, filters),
     get: async (id) => (await api.get(`${path}/${id}`)).data,

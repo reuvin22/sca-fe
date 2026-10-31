@@ -19,9 +19,23 @@ import { getReport, updateReport } from '../../services/supportService'
 import { getTeam } from '../../services/teamService'
 import { PROGRESS_FILTERS, REVIEW, REVIEW_PAGE_FILTERS } from '../../utils/reportBoardHelpers'
 
+const TEAM_TAGS = ['team'] // reload when the team changes (utils/dataSync)
+
 // Card buttons. `changes` is what gets saved (review status, or the board status for Mark as Done).
-const APPROVE = { key: 'approve', changes: { review: 'approved' }, label: 'Approve', icon: CircleCheck, className: 'bg-green-600 text-white hover:bg-green-700' }
-const REJECT = { key: 'reject', changes: { review: 'rejected' }, label: 'Reject', icon: CircleX, className: 'bg-red-600 text-white hover:bg-red-700' }
+const APPROVE = {
+  key: 'approve',
+  changes: { review: 'approved' },
+  label: 'Approve',
+  icon: CircleCheck,
+  className: 'bg-green-600 text-white hover:bg-green-700',
+}
+const REJECT = {
+  key: 'reject',
+  changes: { review: 'rejected' },
+  label: 'Reject',
+  icon: CircleX,
+  className: 'bg-red-600 text-white hover:bg-red-700',
+}
 const BACK_TO_REVIEW = {
   key: 'back',
   changes: { review: 'under-review' },
@@ -30,9 +44,21 @@ const BACK_TO_REVIEW = {
   className: 'border border-gray-300 text-gray-700 hover:bg-gray-50',
 }
 // Approved and in the queue: start working on it (In Progress on the board)
-const START = { key: 'start', changes: { status: 'in-progress' }, label: 'Start', icon: Play, className: 'bg-blue-600 text-white hover:bg-blue-700' }
+const START = {
+  key: 'start',
+  changes: { status: 'in-progress' },
+  label: 'Start',
+  icon: Play,
+  className: 'bg-blue-600 text-white hover:bg-blue-700',
+}
 // Built: moves it to Done, then "Write update & notify users" appears
-const MARK_DONE = { key: 'done', changes: { status: 'done' }, label: 'Mark as Done', icon: CheckCheck, className: 'bg-indigo-600 text-white hover:bg-indigo-700' }
+const MARK_DONE = {
+  key: 'done',
+  changes: { status: 'done' },
+  label: 'Mark as Done',
+  icon: CheckCheck,
+  className: 'bg-indigo-600 text-white hover:bg-indigo-700',
+}
 
 // Buttons shown for each review status (approved ones depend on their progress)
 const ACTIONS = {
@@ -55,7 +81,7 @@ function DevFeatureReviewPage() {
   const [filters, setFilters] = useState({ status: 'under-review', progress: '', search: '' })
   const list = usePaginatedList(featureListService, null, filters)
   const [saving, setSaving] = useState(null) // "<id>-<review>" while saving
-  const team = useFetch(getTeam)
+  const team = useFetch(getTeam, TEAM_TAGS)
   const [opened, setOpened] = useState(null)
   // The card only has public fields, so the full report is loaded before opening
   const open = useRequest(async (feature) => setOpened(await getReport(feature.id)))
@@ -87,7 +113,9 @@ function DevFeatureReviewPage() {
   const handleApprove = async (assigneeId) => {
     await updateReport(approving.id, { review: 'approved', assigneeId })
     const assignee = team.data?.find((member) => member.id === assigneeId)
-    toast.success(`"${approving.subject}" approved and assigned to ${assigneeId === currentUserId ? 'you' : assignee?.name}`)
+    toast.success(
+      `"${approving.subject}" approved and assigned to ${assigneeId === currentUserId ? 'you' : assignee?.name}`,
+    )
     list.reload()
     return true
   }
@@ -130,7 +158,7 @@ function DevFeatureReviewPage() {
 
   const actionsFor = (feature) => {
     if (feature.column === 'done') return doneActionsFor(feature)
-    const actions = feature.review === 'approved' ? APPROVED_ACTIONS[feature.column] ?? [] : ACTIONS[feature.review]
+    const actions = feature.review === 'approved' ? (APPROVED_ACTIONS[feature.column] ?? []) : ACTIONS[feature.review]
     return actions.map((action) => {
       const { key, label, icon: Icon, className } = action
       const busy = saving === `${feature.id}-${key}`
@@ -168,7 +196,11 @@ function DevFeatureReviewPage() {
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
             />
           </div>
-          <div className="flex flex-wrap gap-1 rounded-lg border border-gray-200 p-1" role="tablist" aria-label="Filter by status">
+          <div
+            className="flex flex-wrap gap-1 rounded-lg border border-gray-200 p-1"
+            role="tablist"
+            aria-label="Filter by status"
+          >
             {REVIEW_PAGE_FILTERS.map((option) => (
               <button
                 key={option.value}
@@ -187,7 +219,11 @@ function DevFeatureReviewPage() {
 
         {/* Second filter under Approved: where the work is (developer board column) */}
         {filters.status === 'approved' && (
-          <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Filter approved requests by progress">
+          <div
+            className="flex flex-wrap items-center gap-2"
+            role="tablist"
+            aria-label="Filter approved requests by progress"
+          >
             <span className="text-xs font-medium tracking-wide text-gray-500 uppercase">Progress</span>
             {PROGRESS_FILTERS.map((option) => (
               <button
@@ -214,7 +250,12 @@ function DevFeatureReviewPage() {
           )}
           {!list.loading &&
             list.items.map((feature) => (
-              <FeatureCard key={feature.id} feature={feature} actions={actionsFor(feature)} onOpen={open.loading ? undefined : open.run} />
+              <FeatureCard
+                key={feature.id}
+                feature={feature}
+                actions={actionsFor(feature)}
+                onOpen={open.loading ? undefined : open.run}
+              />
             ))}
         </div>
         <div className="-mx-4 -mb-4 sm:-mx-5 sm:-mb-5">

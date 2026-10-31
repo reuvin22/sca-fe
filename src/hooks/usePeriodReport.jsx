@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react'
 import { getPeriodReport } from '../services/reportService'
+import useDataVersion from './useDataVersion'
+
+const TAGS = ['reports']
 
 // Loads the monthly/annual report. The old report stays on screen while a new period loads.
 function usePeriodReport(year, month) {
   const key = `${year}-${month ?? ''}`
   const [result, setResult] = useState({ key: null, report: null, error: '' })
+  // Cases / appointments changed, or refresh: reload quietly (the old report stays on screen)
+  const synced = useDataVersion(TAGS)
 
   useEffect(() => {
     let ignore = false
@@ -16,7 +21,7 @@ function usePeriodReport(year, month) {
     return () => {
       ignore = true
     }
-  }, [key, year, month])
+  }, [key, year, month, synced])
 
   return { report: result.report, refreshing: result.key !== key, error: result.error }
 }

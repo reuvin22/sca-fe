@@ -6,6 +6,7 @@ const UPLOAD_TIMEOUT = 120000 // big files can take longer than normal requests
 
 // Used by usePaginatedList. Files can't be edited, so there is no update.
 export const fileService = {
+  tags: ['files'],
   list: (filters, page) => fetchPage(FILES_ROUTE, filters, page),
   listAll: (filters) => fetchAllPages(FILES_ROUTE, filters),
   // `file` is a browser File from an <input type="file"> or drop

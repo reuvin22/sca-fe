@@ -4,6 +4,8 @@ export const normalizeName = (text) => text.trim().toLowerCase()
 // Fields with these names always use Settings options, even if the category was deleted
 // (adding a value then creates the category again). Same names as the backend's default categories.
 const SETTINGS_CATEGORY_NAMES = [
+  // Names of students already served, so a repeat case or record picks the same student
+  'Student Name',
   'Sex',
   'Grade & Section',
   'Nature of Concern',

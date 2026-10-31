@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import { getBoard, saveBoard } from '../services/todoService'
+import useDataVersion from './useDataVersion'
 import * as todo from '../utils/todoHelpers'
 
 // Toast after saving a card: added, updated, or moved to another column
@@ -13,16 +14,24 @@ function cardMessage(board, card) {
   return 'Card updated'
 }
 
+const TAGS = ['todo']
+
 // Board state for the To Do page. Each action saves the updated board.
 function useTodoBoard() {
   const [board, setBoard] = useState(null)
   const [error, setError] = useState('')
+  // Reloads when the board changed in another tab and on refresh (utils/dataSync)
+  const synced = useDataVersion(TAGS)
 
   useEffect(() => {
+    let ignore = false
     getBoard()
-      .then(setBoard)
-      .catch(() => setError('Could not load the board. Please try again.'))
-  }, [])
+      .then((loaded) => !ignore && setBoard(loaded))
+      .catch(() => !ignore && setError('Could not load the board. Please try again.'))
+    return () => {
+      ignore = true
+    }
+  }, [synced])
 
   // Applies a change, saves it, then shows `message`. Throws on failure so modals can show the error.
   const update = async (change, message) => {

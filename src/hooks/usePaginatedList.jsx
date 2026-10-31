@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import useDebounce from './useDebounce'
+import useDataVersion from './useDataVersion'
 
 // A backend list with filters, pages (max 15 per page) and create/update/delete.
 // `service` must be defined outside the component: { list, listAll, create, update?, remove }.
@@ -25,7 +26,9 @@ function usePaginatedList(service, label, filters, { all = false } = {}) {
     setPage(1)
   }
 
-  const requestKey = `${filterKey}|${page}|${all}|${version}`
+  // Changes after a create / update / delete of this data (here, in another tab) and on refresh (utils/dataSync)
+  const synced = useDataVersion(service.tags)
+  const requestKey = `${filterKey}|${page}|${all}|${version}|${synced}`
   const loading = !result.key || result.all !== all // nothing to show yet: skeleton
   const refreshing = !loading && result.key !== requestKey // showing the last rows while new ones load
 
@@ -38,7 +41,8 @@ function usePaginatedList(service, label, filters, { all = false } = {}) {
     request
       .then((data) => !ignore && setResult({ key: requestKey, all, ...data, error: '' }))
       .catch(() => {
-        if (!ignore) setResult((prev) => ({ ...prev, key: requestKey, all, error: 'Could not load data. Please try again.' }))
+        if (!ignore)
+          setResult((prev) => ({ ...prev, key: requestKey, all, error: 'Could not load data. Please try again.' }))
       })
     return () => {
       ignore = true
@@ -61,7 +65,7 @@ function usePaginatedList(service, label, filters, { all = false } = {}) {
     } else {
       setPage(1) // go to page 1 to show the new item
     }
-    reload()
+    // The quiet reload happens by itself: the change marked this data as changed (utils/dataSync)
     return saved
   }
 
@@ -71,7 +75,6 @@ function usePaginatedList(service, label, filters, { all = false } = {}) {
     updateItems((items) => items.filter((item) => item.id !== id))
     // The last row of a page was deleted: go back one page
     if (result.items.length === 1 && page > 1) setPage(page - 1)
-    else reload()
   }
 
   const { items, pagination, error } = result

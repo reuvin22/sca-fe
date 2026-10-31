@@ -10,7 +10,8 @@ function FormField({ label, category = label, value, type, ...props }) {
   const options = useCategoryOptions(category)
   const addOption = useAddSettingsOption()
 
-  if (!options && !isDefaultSettingsCategory(category)) return <Input label={label} type={type} value={value} {...props} />
+  if (!options && !isDefaultSettingsCategory(category))
+    return <Input label={label} type={type} value={value} {...props} />
 
   return (
     <SearchSelect

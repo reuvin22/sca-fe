@@ -36,6 +36,8 @@ Before building a feature, inspect the existing structure, docs, and code. Do no
 - Every table has an Export button (`ExportMenu`) with PDF, Excel and CSV, using `exportTable()` from `utils/export`. Define table columns once with a plain `value(row)` so the table and exports share them.
 - All displayed dates use `formatDate()` from `utils/dateHelpers` (format: `Jun 03, 2026`).
 - Text form fields use `FormField`. If a Settings category has the same name as the field label (e.g. "Grade & Section", "Sex"), it shows a select with the Settings options.
+- **All data dropdowns work the same way (HARD rule).** Any dropdown of data values (Grade & Section, Sex, School Year, staff, concerns…) — in pages, filters, Forms, form templates and PDF templates — takes its options from the Settings category with the same name, and lets the user add a missing value right in the dropdown (`Add "…"`), which saves it to Settings so every dropdown gets it. Use `FormField` (or `SearchSelect` with `onCreate` → `useAddSettingsOption`); never hard-code a separate list for data that has a Settings category. In the form builder, a choice question (dropdown / radio / checkbox) whose label matches a Settings category takes its options from Settings (`SettingsOptions`), and adding an option there adds it to Settings.
+- **Student names** use the Settings category "Student Name" (only so repeat cases and records can pick the same student): the case's Name of Learner, the Students form, appointments (`StudentSelect`, which also suggests names from Students records) and PDF templates. A new name is added with `Add "…"`.
 - Theme colors (Light / Dark / Custom palettes in `index.css`): use `bg-surface` (not `bg-white`), `bg-page`, `bg-primary` / `hover:bg-primary-hover`, and `*-brand-*` for accents. Use `gray-*` for text/borders so dark mode works.
 - Use skeleton loaders while data is loading.
 - Optimize images: `loading="lazy"`, set `width`/`height`, use compressed formats (WebP).
@@ -53,6 +55,7 @@ Create, update, delete, vote and other changes must never blank or flash the scr
 - **Don't download things twice.** Files, images and videos (blob URLs) load once and are revoked when no longer shown.
 - **Optimistic UI for quick actions** (drag and drop, votes): change the screen first, save in the background, and roll back with an error toast if saving fails.
 - Before finishing a task, check: after each CRUD action, does anything on screen flash, disappear, or reload that didn't change?
+- **Live data without websockets** (like RTK Query tags, see `utils/dataSync`): every successful create / update / delete marks its data type as changed (from the URL, e.g. `/cases` → `cases`, plus related views like `reports`), and every list or card showing it reloads quietly — in this tab and other open tabs. Data also reloads when the user returns to the tab, after reconnecting, and every 30 s while visible. List services carry `tags` (`createListService` adds them); `useFetch(request, tags)` and custom data hooks add `useDataVersion(tags)` to their effect. Don't add manual reloads after a save — the change already triggers them. One-time loads (e.g. checking an invitation link) pass no tags.
 
 ## API
 - Keep API code separate from UI:

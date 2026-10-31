@@ -7,7 +7,18 @@ import useRequest from '../../hooks/useRequest'
 
 // Modal with a form and Delete / Close / Save buttons. Delete shows only when `onDelete` is passed.
 // `submitLabel` overrides the default Add / Save text.
-function FormModal({ title, onSubmit, onClose, onDelete, deleteMessage, saving, error, className, submitLabel, children }) {
+function FormModal({
+  title,
+  onSubmit,
+  onClose,
+  onDelete,
+  deleteMessage,
+  saving,
+  error,
+  className,
+  submitLabel,
+  children,
+}) {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const remove = useRequest(onDelete)
 
@@ -24,7 +35,13 @@ function FormModal({ title, onSubmit, onClose, onDelete, deleteMessage, saving, 
 
           <div className="flex flex-wrap justify-end gap-2 pt-2">
             {onDelete && (
-              <Button type="button" variant="danger" fullWidth={false} className="mr-auto" onClick={() => setConfirmOpen(true)}>
+              <Button
+                type="button"
+                variant="danger"
+                fullWidth={false}
+                className="mr-auto"
+                onClick={() => setConfirmOpen(true)}
+              >
                 Delete
               </Button>
             )}

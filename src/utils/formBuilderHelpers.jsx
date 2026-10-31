@@ -51,14 +51,15 @@ export const VARIABLES = [
     type: 'text',
     parts: ['House No. / Street', 'Barangay', 'City / Municipality', 'Province', 'ZIP Code'],
   },
-  { variable: 'section', label: 'Grade & Section', type: 'text', width: 'half' },
+  // Dropdowns: their options come from the Settings category with the same name (see QuestionEditor)
+  { variable: 'section', label: 'Grade & Section', type: 'select', width: 'half' },
   { variable: 'instructor', label: 'Instructor / Adviser', type: 'text', width: 'half' },
   { variable: 'lrn', label: 'LRN', type: 'text', width: 'half' },
   { variable: 'age', label: 'Age', type: 'number', width: 'third' },
   { variable: 'sex', label: 'Sex', type: 'checkbox', width: 'third', options: ['Male', 'Female'] },
   { variable: 'contactNumber', label: 'Contact Number', type: 'tel', width: 'half' },
   { variable: 'email', label: 'Email', type: 'email', width: 'half' },
-  { variable: 'schoolYear', label: 'School Year', type: 'text', width: 'third' },
+  { variable: 'schoolYear', label: 'School Year', type: 'select', width: 'third' },
 ]
 
 export const newQuestion = (preset = {}) => ({

@@ -11,6 +11,8 @@ import useRequest from '../../hooks/useRequest'
 import { getTeam, inviteDeveloper } from '../../services/teamService'
 import { isEmail } from '../../utils/validators'
 
+const TEAM_TAGS = ['team'] // reload when the team changes (utils/dataSync)
+
 const COLUMNS = [
   { label: 'Name', value: (member) => member.name },
   { label: 'Email', value: (member) => member.email },
@@ -18,7 +20,7 @@ const COLUMNS = [
 
 // Developers: who is on the team (can be assigned reports) and invitations by email
 function DevTeamPage() {
-  const team = useFetch(getTeam)
+  const team = useFetch(getTeam, TEAM_TAGS)
   const invite = useRequest(inviteDeveloper)
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')

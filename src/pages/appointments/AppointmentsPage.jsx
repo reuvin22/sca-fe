@@ -36,7 +36,11 @@ function AppointmentsPage() {
 
   // Drag and drop on the calendar
   const handleMove = (id, date, time) => {
-    const moved = moveAppointment(list.items.find((item) => item.id === id), date, time)
+    const moved = moveAppointment(
+      list.items.find((item) => item.id === id),
+      date,
+      time,
+    )
     if (moved) move.run(moved)
   }
 
@@ -66,10 +70,20 @@ function AppointmentsPage() {
 
       <section className="rounded-xl bg-surface shadow-sm">
         <div className="border-b border-gray-100 p-4">
-          <AppointmentFilters filters={filters} onChange={setFilters} onAdd={() => setSelected(null)} onExport={handleExport} />
+          <AppointmentFilters
+            filters={filters}
+            onChange={setFilters}
+            onAdd={() => setSelected(null)}
+            onExport={handleExport}
+          />
         </div>
         {view === 'calendar' && (
-          <AppointmentCalendar appointments={list.items} loading={list.loading} onSelect={setSelected} onMove={handleMove} />
+          <AppointmentCalendar
+            appointments={list.items}
+            loading={list.loading}
+            onSelect={setSelected}
+            onMove={handleMove}
+          />
         )}
         {view === 'table' && (
           <>

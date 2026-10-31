@@ -31,7 +31,12 @@ function CasesPage() {
 
       <section className="rounded-xl bg-surface shadow-sm">
         <div className="border-b border-gray-100 p-4">
-          <CaseFilters filters={filters} onChange={setFilters} onAdd={() => setSelected(null)} onExport={handleExport} />
+          <CaseFilters
+            filters={filters}
+            onChange={setFilters}
+            onAdd={() => setSelected(null)}
+            onExport={handleExport}
+          />
         </div>
         <CasesTable cases={list.items} loading={list.loading} onRowClick={setSelected} />
         <Pagination pagination={list.pagination} onPageChange={list.setPage} />

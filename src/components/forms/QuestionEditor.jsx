@@ -3,6 +3,8 @@ import Input from '../ui/Input'
 import Select from '../ui/Select'
 import TagInput from '../ui/TagInput'
 import HeaderLabelInput from './HeaderLabelInput'
+import SettingsOptions from './SettingsOptions'
+import useCategoryOptions from '../../hooks/useCategoryOptions'
 import {
   COLUMN_OPTIONS,
   LAYOUT_OPTIONS,
@@ -26,6 +28,8 @@ const iconButton =
 function QuestionEditor({ question, number, position, total, isHeader, errors = {}, onChange, onMove, onRemove }) {
   const isSection = question.type === 'section'
   const hasOptions = OPTION_TYPES.includes(question.type)
+  // A question named like a Settings category takes its choices from Settings
+  const settingsOptions = useCategoryOptions(question.label.trim() || '-')
   const hasLayout = LAYOUT_TYPES.includes(question.type)
   const variable = VARIABLES.find((item) => item.variable === question.variable)
 
@@ -113,13 +117,23 @@ function QuestionEditor({ question, number, position, total, isHeader, errors = 
       {hasOptions && (
         <div className="mt-4 space-y-2">
           <p className="text-sm font-medium text-gray-700">Options</p>
-          <TagInput
-            id={`option-${question.id}`}
-            items={question.options}
-            placeholder="Type an option, then Add"
-            onAdd={(option) => onChange({ options: [...question.options, option] })}
-            onRemove={(option) => onChange({ options: question.options.filter((item) => item !== option) })}
-          />
+          {settingsOptions ? (
+            <SettingsOptions
+              id={`option-${question.id}`}
+              category={question.label.trim()}
+              settingsOptions={settingsOptions}
+              options={question.options}
+              onChange={(options) => onChange({ options })}
+            />
+          ) : (
+            <TagInput
+              id={`option-${question.id}`}
+              items={question.options}
+              placeholder="Type an option, then Add"
+              onAdd={(option) => onChange({ options: [...question.options, option] })}
+              onRemove={(option) => onChange({ options: question.options.filter((item) => item !== option) })}
+            />
+          )}
           {errors.options && <p className="text-xs text-red-600">{errors.options}</p>}
         </div>
       )}

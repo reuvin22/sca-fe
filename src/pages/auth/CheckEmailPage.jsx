@@ -24,8 +24,8 @@ function CheckEmailPage() {
 
       <div className="space-y-4 text-center">
         <p className="text-sm text-gray-600">
-          We sent a confirmation link to <span className="font-medium text-gray-900">{email}</span>.
-          Click the link to activate your account.
+          We sent a confirmation link to <span className="font-medium text-gray-900">{email}</span>. Click the link to
+          activate your account.
         </p>
         <Alert>{error}</Alert>
         {resent && <Alert type="success">Confirmation email sent again.</Alert>}

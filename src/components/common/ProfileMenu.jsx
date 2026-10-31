@@ -7,7 +7,8 @@ import { logout } from '../../services/authService'
 import { signOut } from '../../store/authSlice'
 import { getShortName } from '../../utils/stringHelpers'
 
-const itemClass = 'flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50'
+const itemClass =
+  'flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50'
 
 function ProfileMenu() {
   const navigate = useNavigate()

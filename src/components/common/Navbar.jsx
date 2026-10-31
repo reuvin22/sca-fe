@@ -25,14 +25,20 @@ function Navbar() {
         </div>
 
         <div className="flex items-center gap-1">
-          <button onClick={() => setSupportOpen(true)} className={`flex items-center gap-1.5 ${iconButton}`} aria-label="Contact Support">
+          <button
+            onClick={() => setSupportOpen(true)}
+            className={`flex items-center gap-1.5 ${iconButton}`}
+            aria-label="Contact Support"
+          >
             <LifeBuoy size={20} />
             <span className="hidden text-sm font-medium lg:inline">Contact Support</span>
           </button>
           <NavLink
             to="/feature-requests"
             aria-label="Feature Requests"
-            className={({ isActive }) => `flex items-center gap-1.5 ${iconButton} ${isActive ? 'bg-gray-100 text-gray-900' : ''}`}
+            className={({ isActive }) =>
+              `flex items-center gap-1.5 ${iconButton} ${isActive ? 'bg-gray-100 text-gray-900' : ''}`
+            }
           >
             <Lightbulb size={20} />
             <span className="hidden text-sm font-medium lg:inline">Feature Requests</span>

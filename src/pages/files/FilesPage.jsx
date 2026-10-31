@@ -99,9 +99,22 @@ function FilesPage() {
       <section className="rounded-xl bg-surface shadow-sm">
         <div className="flex flex-wrap items-center gap-2 border-b border-gray-100 p-4">
           <div className="w-full sm:w-56">
-            <Input id="search" type="search" placeholder="Search files" aria-label="Search files" value={filters.search} onChange={handleChange} />
+            <Input
+              id="search"
+              type="search"
+              placeholder="Search files"
+              aria-label="Search files"
+              value={filters.search}
+              onChange={handleChange}
+            />
           </div>
-          <Select id="kind" aria-label="Filter by type" options={FILE_KIND_OPTIONS} value={filters.kind} onChange={handleChange} />
+          <Select
+            id="kind"
+            aria-label="Filter by type"
+            options={FILE_KIND_OPTIONS}
+            value={filters.kind}
+            onChange={handleChange}
+          />
           <div className="ml-auto">
             <ExportMenu onExport={handleExport} />
           </div>

@@ -77,7 +77,11 @@ function FeatureRequestsPage() {
               />
             </div>
             {/* Wraps onto two rows on narrow phones so no filter is pushed off screen */}
-            <div className="flex flex-wrap gap-1 rounded-lg border border-gray-200 p-1" role="tablist" aria-label="Filter by status">
+            <div
+              className="flex flex-wrap gap-1 rounded-lg border border-gray-200 p-1"
+              role="tablist"
+              aria-label="Filter by status"
+            >
               {FEATURE_FILTERS.map((option) => (
                 <button
                   key={option.value}
@@ -96,7 +100,11 @@ function FeatureRequestsPage() {
 
           {/* Second filter under Approved: how far the work is */}
           {filters.status === 'approved' && (
-            <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Filter approved requests by progress">
+            <div
+              className="flex flex-wrap items-center gap-2"
+              role="tablist"
+              aria-label="Filter approved requests by progress"
+            >
               <span className="text-xs font-medium tracking-wide text-gray-500 uppercase">Progress</span>
               {PROGRESS_FILTERS.map((option) => (
                 <button
@@ -118,7 +126,9 @@ function FeatureRequestsPage() {
             {all.loading && <ListSkeleton />}
             {!all.loading && all.items.length === 0 && (
               <p className="py-10 text-center text-sm text-gray-400">
-                {filters.search || filters.progress ? 'No feature requests match these filters.' : 'No feature requests here yet.'}
+                {filters.search || filters.progress
+                  ? 'No feature requests match these filters.'
+                  : 'No feature requests here yet.'}
               </p>
             )}
             {!all.loading &&
@@ -145,7 +155,13 @@ function FeatureRequestsPage() {
             )}
             {!mine.loading &&
               mine.items.map((feature) => (
-                <FeatureCard key={feature.id} feature={feature} onVote={handleVote} voting={votingId === feature.id} compact />
+                <FeatureCard
+                  key={feature.id}
+                  feature={feature}
+                  onVote={handleVote}
+                  voting={votingId === feature.id}
+                  compact
+                />
               ))}
           </div>
           <div className="-mx-4 -mb-4 sm:-mx-5 sm:-mb-5">

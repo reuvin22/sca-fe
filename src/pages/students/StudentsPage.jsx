@@ -18,7 +18,11 @@ function StudentsPage() {
 
   // Exports every student that matches the filters
   const handleExport = (format) =>
-    exportAllRows(studentService, filters, format, { sheetName: 'Students', columns: STUDENT_COLUMNS, fileName: 'students' })
+    exportAllRows(studentService, filters, format, {
+      sheetName: 'Students',
+      columns: STUDENT_COLUMNS,
+      fileName: 'students',
+    })
 
   return (
     <div className="space-y-6">
@@ -31,7 +35,12 @@ function StudentsPage() {
 
       <section className="rounded-xl bg-surface shadow-sm">
         <div className="border-b border-gray-100 p-4">
-          <StudentFilters filters={filters} onChange={setFilters} onAdd={() => setSelected(null)} onExport={handleExport} />
+          <StudentFilters
+            filters={filters}
+            onChange={setFilters}
+            onAdd={() => setSelected(null)}
+            onExport={handleExport}
+          />
         </div>
         <StudentsTable students={list.items} loading={list.loading} onRowClick={setSelected} />
         <Pagination pagination={list.pagination} onPageChange={list.setPage} />

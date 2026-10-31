@@ -34,7 +34,12 @@ const HINTS = {
 // Shows a thank-you message after sending.
 // `initialType` picks the starting type ('bug' | 'feature'). `onSent` runs after a request is sent.
 function SupportModal({ onClose, initialType = 'bug', onSent }) {
-  const { form, errors, setErrors, handleChange } = useForm({ type: initialType, severity: 'medium', subject: '', description: '' })
+  const { form, errors, setErrors, handleChange } = useForm({
+    type: initialType,
+    severity: 'medium',
+    subject: '',
+    description: '',
+  })
   const send = useRequest(sendSupportRequest)
   const [sent, setSent] = useState(false)
   // Screenshots / screen recordings, bug reports only
@@ -78,7 +83,13 @@ function SupportModal({ onClose, initialType = 'bug', onSent }) {
     >
       <Select label="Type" id="type" options={TYPE_OPTIONS} value={form.type} onChange={handleChange} />
       {form.type === 'bug' && (
-        <Select label="Severity" id="severity" options={SEVERITY_OPTIONS} value={form.severity} onChange={handleChange} />
+        <Select
+          label="Severity"
+          id="severity"
+          options={SEVERITY_OPTIONS}
+          value={form.severity}
+          onChange={handleChange}
+        />
       )}
       <Input label="Subject" id="subject" value={form.subject} onChange={handleChange} error={errors.subject} />
       <Textarea

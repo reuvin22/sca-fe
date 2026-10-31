@@ -48,7 +48,13 @@ function RegisterPage() {
         <Alert>{error}</Alert>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <Input label="Full name" id="fullName" value={form.fullName} onChange={handleChange} error={errors.fullName} />
+            <Input
+              label="Full name"
+              id="fullName"
+              value={form.fullName}
+              onChange={handleChange}
+              error={errors.fullName}
+            />
           </div>
           <Input
             label="Email"

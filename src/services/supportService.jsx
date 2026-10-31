@@ -20,7 +20,10 @@ export async function updateReport(id, changes) {
 
 // Developers: a report's image/video as a temporary URL (revoke it when done)
 export async function getReportAttachmentUrl(reportId, index) {
-  const blob = await api.get(`${SUPPORT_ROUTE}/${reportId}/attachments/${index}`, { responseType: 'blob', timeout: UPLOAD_TIMEOUT })
+  const blob = await api.get(`${SUPPORT_ROUTE}/${reportId}/attachments/${index}`, {
+    responseType: 'blob',
+    timeout: UPLOAD_TIMEOUT,
+  })
   return URL.createObjectURL(blob)
 }
 

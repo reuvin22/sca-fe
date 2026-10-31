@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import { getReportBoard, updateReport } from '../services/supportService'
+import useDataVersion from './useDataVersion'
+
+const TAGS = ['support']
 
 // Reports of one type ('bug' | 'feature') for the developers' Kanban board
 function useReportBoard(type) {
   const [result, setResult] = useState({ type: null, reports: [], error: '' })
   const loading = result.type !== type
+  // Reloads quietly when reports change (here or in another tab) and on refresh (utils/dataSync)
+  const synced = useDataVersion(TAGS)
 
   useEffect(() => {
     let ignore = false
@@ -15,7 +20,7 @@ function useReportBoard(type) {
     return () => {
       ignore = true
     }
-  }, [type])
+  }, [type, synced])
 
   const replace = (updated) =>
     setResult((prev) => ({ ...prev, reports: prev.reports.map((item) => (item.id === updated.id ? updated : item)) }))

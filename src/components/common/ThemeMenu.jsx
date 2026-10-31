@@ -4,7 +4,8 @@ import Dropdown from '../ui/Dropdown'
 import { setPalette, setTheme } from '../../store/uiSlice'
 import { PALETTES, THEMES } from '../../utils/themeHelpers'
 
-const itemClass = 'flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 text-left text-sm text-gray-700 hover:bg-gray-50'
+const itemClass =
+  'flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 text-left text-sm text-gray-700 hover:bg-gray-50'
 
 // Light or Dark mode, plus an optional custom color palette on top
 function ThemeMenu() {

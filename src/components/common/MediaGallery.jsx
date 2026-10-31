@@ -46,10 +46,20 @@ function MediaGallery({ items, loadUrl }) {
             <li key={item.index} className="overflow-hidden rounded-xl border border-gray-200 bg-black">
               {!url && <Skeleton className="aspect-video w-full rounded-none" />}
               {url && item.kind === 'video' && (
-                <video src={url} controls preload="metadata" className="aspect-video w-full bg-black" aria-label={item.name} />
+                <video
+                  src={url}
+                  controls
+                  preload="metadata"
+                  className="aspect-video w-full bg-black"
+                  aria-label={item.name}
+                />
               )}
               {url && item.kind === 'image' && (
-                <button type="button" onClick={() => setZoomed({ url, name: item.name })} className="block w-full cursor-zoom-in">
+                <button
+                  type="button"
+                  onClick={() => setZoomed({ url, name: item.name })}
+                  className="block w-full cursor-zoom-in"
+                >
                   <img src={url} alt={item.name} className="aspect-video w-full object-contain" />
                 </button>
               )}

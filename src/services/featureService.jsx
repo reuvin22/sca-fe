@@ -5,11 +5,13 @@ import { fetchPage } from '../utils/apiHelpers'
 // Feature requests with one review status, most votes first. Used by usePaginatedList.
 // filters: { status: 'approved' | 'under-review' | 'rejected', search }
 export const featureListService = {
+  tags: ['features'],
   list: (filters, page) => fetchPage(FEATURES_ROUTE, filters, page),
 }
 
 // The signed-in user's own requests (every status), most votes first
 export const myFeatureService = {
+  tags: ['features'],
   list: (filters, page) => fetchPage(`${FEATURES_ROUTE}/mine`, filters, page),
 }
 

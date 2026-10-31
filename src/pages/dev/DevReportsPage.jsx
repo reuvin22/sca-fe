@@ -10,11 +10,13 @@ import useReportBoard from '../../hooks/useReportBoard'
 import { getTeam } from '../../services/teamService'
 import { REPORT_COLUMNS, REPORT_TABS } from '../../utils/reportBoardHelpers'
 
+const TEAM_TAGS = ['team'] // reload when the team changes (utils/dataSync)
+
 // Developers: Contact Support messages as a Kanban board, one tab for bugs and one for feature requests
 function DevReportsPage() {
   const [type, setType] = useState('bug')
   const { reports, loading, error, changeReport, moveReport, markPublished } = useReportBoard(type)
-  const team = useFetch(getTeam)
+  const team = useFetch(getTeam, TEAM_TAGS)
   const [openId, setOpenId] = useState(null)
   const opened = reports.find((report) => report.id === openId)
   // The done report whose update is being written (publishing notifies every user), or null

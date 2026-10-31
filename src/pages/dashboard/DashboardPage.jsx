@@ -16,23 +16,24 @@ import { caseService } from '../../services/caseService'
 import { getDashboard } from '../../services/reportService'
 import { getDashboardData } from '../../utils/dashboardHelpers'
 
+// Cases and appointments changes refresh the dashboard (utils/dataSync)
+const DATA_TAGS = ['reports']
+
 function DashboardPage() {
-  const { data, loading, error, reload } = useFetch(getDashboard)
+  const { data, loading, error } = useFetch(getDashboard, DATA_TAGS)
   const [selected, setSelected] = useState(null)
   // The follow-up cards only have a summary, so the full case is loaded before editing
   const openCase = useRequest(async (item) => setSelected(await caseService.get(item.id)))
 
-  // After a change in the modal, reload the dashboard so every chart updates
+  // After a change in the modal every chart updates by itself (the change marks the data as changed)
   const handleSave = async (form) => {
     await caseService.update(form)
     toast.success('Case updated')
-    reload()
   }
 
   const handleDelete = async (id) => {
     await caseService.remove(id)
     toast.success('Case deleted')
-    reload()
   }
 
   if (loading) return <DashboardSkeleton />
@@ -60,7 +61,13 @@ function DashboardPage() {
       </div>
 
       {selected && (
-        <CaseModal key={selected.id} caseItem={selected} onSave={handleSave} onDelete={handleDelete} onClose={() => setSelected(null)} />
+        <CaseModal
+          key={selected.id}
+          caseItem={selected}
+          onSave={handleSave}
+          onDelete={handleDelete}
+          onClose={() => setSelected(null)}
+        />
       )}
     </div>
   )

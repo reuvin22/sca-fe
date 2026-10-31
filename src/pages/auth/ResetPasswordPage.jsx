@@ -34,8 +34,22 @@ function ResetPasswordPage() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <Alert>{error}</Alert>
-          <Input label="New password" id="password" type="password" value={form.password} onChange={handleChange} error={errors.password} />
-          <Input label="Confirm password" id="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange} error={errors.confirmPassword} />
+          <Input
+            label="New password"
+            id="password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+            error={errors.password}
+          />
+          <Input
+            label="Confirm password"
+            id="confirmPassword"
+            type="password"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            error={errors.confirmPassword}
+          />
           <Button type="submit" loading={loading}>
             {loading ? 'Saving...' : 'Reset password'}
           </Button>

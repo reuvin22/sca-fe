@@ -26,9 +26,7 @@ function ForgotPasswordPage() {
       <AuthHeader title="Forgot password?" subtitle="We'll send you a link to reset it" />
 
       {sent ? (
-        <Alert type="success">
-          If an account exists for {email}, you'll get an email with a reset link.
-        </Alert>
+        <Alert type="success">If an account exists for {email}, you'll get an email with a reset link.</Alert>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <Alert>{error}</Alert>

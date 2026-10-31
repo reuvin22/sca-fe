@@ -4,7 +4,7 @@ import { FileText, FileType } from 'lucide-react'
 import Modal from '../ui/Modal'
 import Alert from '../ui/Alert'
 import Button from '../ui/Button'
-import Input from '../ui/Input'
+import FormField from '../common/FormField'
 import Textarea from '../ui/Textarea'
 import DatePicker from '../ui/DatePicker'
 import useRequest from '../../hooks/useRequest'
@@ -14,6 +14,8 @@ import { downloadTemplateDocx } from '../../utils/templates/templateDocx'
 
 // Fills in a template's details, then opens it in the PDF editor or downloads it as Word.
 // Dates are picked with the calendar and written out (e.g. Oct 31, 2026). Empty details print as blanks.
+// Details named like a Settings category (Grade & Section, School Year…) pick from Settings, and a missing
+// value can be added there.
 function TemplateFillModal({ template, onUse, onClose }) {
   const { user, school } = useSelector((state) => state.auth)
   const variables = templateVariables(template)
@@ -54,7 +56,13 @@ function TemplateFillModal({ template, onUse, onClose }) {
                 onChange={(e) => set(key, e.target.value)}
               />
             ) : (
-              <Input label={label} id={`var-${key}`} value={values[key]} onChange={(e) => set(key, e.target.value)} />
+              // A Settings dropdown (with Add) when a category has this name, e.g. Grade & Section
+              <FormField
+                label={label}
+                id={`var-${key}`}
+                value={values[key]}
+                onChange={(e) => set(key, e.target.value)}
+              />
             )}
           </div>
         ))}

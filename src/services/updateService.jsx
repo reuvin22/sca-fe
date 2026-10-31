@@ -19,7 +19,10 @@ export async function getUpdate(id) {
 
 // An update's image/video as a temporary URL (revoke it when done)
 export async function getUpdateMediaUrl(updateId, index) {
-  const blob = await api.get(`${UPDATES_ROUTE}/${updateId}/media/${index}`, { responseType: 'blob', timeout: UPLOAD_TIMEOUT })
+  const blob = await api.get(`${UPDATES_ROUTE}/${updateId}/media/${index}`, {
+    responseType: 'blob',
+    timeout: UPLOAD_TIMEOUT,
+  })
   return URL.createObjectURL(blob)
 }
 

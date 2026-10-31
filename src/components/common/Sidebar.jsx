@@ -59,7 +59,8 @@ function Sidebar() {
       title={label}
       onClick={closeOnMobile}
       className={({ isActive }) =>
-        `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${isActive ? 'bg-brand-50 text-brand-700' : 'text-gray-600 hover:bg-gray-50'
+        `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+          isActive ? 'bg-brand-50 text-brand-700' : 'text-gray-600 hover:bg-gray-50'
         } ${collapsed ? 'justify-center' : ''}`
       }
     >
@@ -72,10 +73,7 @@ function Sidebar() {
     <>
       {/* Backdrop when the sidebar is open on mobile */}
       {!collapsed && (
-        <div
-          onClick={() => dispatch(toggleSidebar())}
-          className="fixed inset-0 z-20 bg-black/30 md:hidden"
-        />
+        <div onClick={() => dispatch(toggleSidebar())} className="fixed inset-0 z-20 bg-black/30 md:hidden" />
       )}
 
       {/* Small screens: hidden until the burger menu opens it. md and up: icons only when collapsed. */}

@@ -27,7 +27,11 @@ function NotificationMenu() {
           <div className="flex items-center justify-between border-b border-gray-100 px-3 py-2">
             <p className="text-sm font-semibold text-gray-900">Notifications</p>
             {unreadCount > 0 && (
-              <button type="button" onClick={markAllRead} className="cursor-pointer text-xs font-medium text-brand-600 hover:underline">
+              <button
+                type="button"
+                onClick={markAllRead}
+                className="cursor-pointer text-xs font-medium text-brand-600 hover:underline"
+              >
                 Mark all as read
               </button>
             )}

@@ -68,13 +68,30 @@ function DevRegisterPage() {
 
   return (
     <>
-      <AuthHeader title="Join the developer team" subtitle={`Create the developer account for ${invitation.data.email}`} />
+      <AuthHeader
+        title="Join the developer team"
+        subtitle={`Create the developer account for ${invitation.data.email}`}
+      />
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <Alert>{register.error}</Alert>
         <Input label="Email" id="email" value={invitation.data.email} disabled />
         <Input label="Full name" id="fullName" value={form.fullName} onChange={handleChange} error={errors.fullName} />
-        <Input label="Password" id="password" type="password" value={form.password} onChange={handleChange} error={errors.password} />
-        <Input label="Confirm password" id="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange} error={errors.confirmPassword} />
+        <Input
+          label="Password"
+          id="password"
+          type="password"
+          value={form.password}
+          onChange={handleChange}
+          error={errors.password}
+        />
+        <Input
+          label="Confirm password"
+          id="confirmPassword"
+          type="password"
+          value={form.confirmPassword}
+          onChange={handleChange}
+          error={errors.confirmPassword}
+        />
         <Button type="submit" loading={register.loading}>
           {register.loading ? 'Creating account...' : 'Create developer account'}
         </Button>

@@ -11,7 +11,8 @@ import useTodoBoard from '../../hooks/useTodoBoard'
 import { filterCards } from '../../utils/todoHelpers'
 
 function TodoPage() {
-  const { board, loading, error, addColumn, renameColumn, removeColumn, saveCard, removeCard, moveCard } = useTodoBoard()
+  const { board, loading, error, addColumn, renameColumn, removeColumn, saveCard, removeCard, moveCard } =
+    useTodoBoard()
   // undefined = closed, null = add, object = edit
   const [editColumn, setEditColumn] = useState(undefined)
   // null = closed. A card without an id is a new card.

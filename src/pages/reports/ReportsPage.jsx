@@ -10,8 +10,10 @@ import useFetch from '../../hooks/useFetch'
 import { getReportSummary } from '../../services/reportService'
 import { getReportData } from '../../utils/reportHelpers'
 
+const DATA_TAGS = ['reports']
+
 function ReportsPage() {
-  const { data: summary, loading, error } = useFetch(getReportSummary)
+  const { data: summary, loading, error } = useFetch(getReportSummary, DATA_TAGS)
   const data = summary && getReportData(summary)
 
   return (
@@ -37,7 +39,12 @@ function ReportsPage() {
             <ProgressCard title="Rates" items={data.rates} />
             <MonthlyChartCard title="Appointments by Month" months={data.appointmentsByMonth} />
             <CountBarsCard title="Completed vs Pending Cases" icon={CircleCheck} bars={data.caseStatus} />
-            <CountBarsCard title="Referrals by Category" icon={Share2} bars={data.referrals} emptyText="No referrals yet." />
+            <CountBarsCard
+              title="Referrals by Category"
+              icon={Share2}
+              bars={data.referrals}
+              emptyText="No referrals yet."
+            />
           </div>
           <WorkloadCard rows={data.workload} />
         </>

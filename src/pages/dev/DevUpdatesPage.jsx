@@ -13,11 +13,13 @@ import { getDoneTasks } from '../../services/updateService'
 import { formatDate } from '../../utils/dateHelpers'
 import { REPORT_TYPE } from '../../utils/reportBoardHelpers'
 
+const UPDATE_TAGS = ['support', 'updates'] // reload when tasks or updates change (utils/dataSync)
+
 const PAGE_SIZE = 15
 
 // Developers: every Done task. Write an update for each one; publishing notifies all users.
 function DevUpdatesPage() {
-  const { data, loading, error, reload } = useFetch(getDoneTasks)
+  const { data, loading, error, reload } = useFetch(getDoneTasks, UPDATE_TAGS)
   const [writing, setWriting] = useState(null)
   const [page, setPage] = useState(1)
   const tasks = data ?? []
@@ -48,7 +50,9 @@ function DevUpdatesPage() {
           </div>
         )}
         {!loading && tasks.length === 0 && (
-          <p className="p-8 text-center text-sm text-gray-400">No done tasks yet. Move reports to Done on the Reports board.</p>
+          <p className="p-8 text-center text-sm text-gray-400">
+            No done tasks yet. Move reports to Done on the Reports board.
+          </p>
         )}
         <ul className="divide-y divide-gray-100">
           {visible.map((task) => (
