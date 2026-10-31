@@ -29,5 +29,5 @@ CLAUDE.md
 .env
 
 sca.json
-.env-example
+.env.example
 CLAUDE.md
