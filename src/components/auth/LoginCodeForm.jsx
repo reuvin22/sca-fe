@@ -6,6 +6,7 @@ import Button from '../ui/Button'
 import Alert from '../ui/Alert'
 import useRequest from '../../hooks/useRequest'
 import { resendLoginCode, verifyLoginCode } from '../../services/authService'
+import WaitingNotice from '../../components/common/WaitingNotice'
 
 // Second sign-in step (two-factor authentication): the 6-digit code emailed after the password.
 // `pending` is { challenge, email } from the first step; `onSignedIn` gets { token, profile }.
@@ -49,6 +50,7 @@ function LoginCodeForm({ pending, onSignedIn, onBack }) {
         <Button type="submit" loading={verify.loading}>
           {verify.loading ? 'Checking...' : 'Sign in'}
         </Button>
+        <WaitingNotice active={verify.loading || resend.loading} />
       </form>
 
       <div className="mt-6 flex items-center justify-between text-sm">

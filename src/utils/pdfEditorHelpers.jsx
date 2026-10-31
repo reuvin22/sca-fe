@@ -1,5 +1,5 @@
 // PDF editor helpers: reading a PDF (pdf.js), drawing its pages, and saving the edited PDF (pdf-lib).
-// Everything runs in the browser; the file is not uploaded unless the user saves it to Files.
+// Everything runs in the browser; the file is not uploaded unless the user saves it to PDF Documents.
 
 export const A4 = { width: 595.28, height: 841.89 } // PDF points
 const PAGE_IMAGE_SCALE = 2 // page background is drawn at 2× for sharp zooming
@@ -46,7 +46,7 @@ export const DEFAULT_STYLE = {
 }
 
 let pdfjs
-async function loadPdfJs() {
+export async function loadPdfJs() {
   if (!pdfjs) {
     const [lib, worker] = await Promise.all([import('pdfjs-dist'), import('pdfjs-dist/build/pdf.worker.min.mjs?url')])
     lib.GlobalWorkerOptions.workerSrc = worker.default

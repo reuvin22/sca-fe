@@ -17,9 +17,4 @@ export async function exportForm(form, format) {
   if (form.id) recordFormExport(form.id, format).catch(() => {})
 }
 
-// Blob URL of the printable PDF, for the preview
-export async function formPreviewUrl(form) {
-  return (await import('./exportFormPdf')).formPdfUrl(form)
-}
-
 export const FORM_EXPORT_FORMATS = ['pdf', 'word']

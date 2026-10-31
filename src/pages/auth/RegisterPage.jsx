@@ -10,6 +10,7 @@ import useRequest from '../../hooks/useRequest'
 import { register } from '../../services/authService'
 import { validateRegister } from '../../utils/validators'
 import { emptyAddress } from '../../utils/addressHelpers'
+import WaitingNotice from '../../components/common/WaitingNotice'
 
 function RegisterPage() {
   const navigate = useNavigate()
@@ -102,6 +103,7 @@ function RegisterPage() {
             error={errors.confirmPassword}
           />
         </div>
+        <WaitingNotice active={loading} />
         <Button type="submit" loading={loading}>
           {loading ? 'Creating account...' : 'Register'}
         </Button>

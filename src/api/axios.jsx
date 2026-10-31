@@ -31,7 +31,9 @@ api.interceptors.response.use(
 
     const message = error.response
       ? error.response.data?.message || 'Something went wrong. Please try again.'
-      : 'Cannot reach the server. Please check your connection.'
+      : error.code === 'ECONNABORTED'
+        ? 'The server took too long to answer. Please try again.'
+        : 'Cannot reach the server. Please check your connection.'
     return Promise.reject(new Error(message))
   },
 )

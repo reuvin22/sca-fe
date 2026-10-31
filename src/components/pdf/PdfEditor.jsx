@@ -7,7 +7,7 @@ import TemplateGallery from './TemplateGallery'
 import Button from '../ui/Button'
 import Alert from '../ui/Alert'
 import ConfirmModal from '../ui/ConfirmModal'
-import Modal from '../ui/Modal'
+import PdfPreviewModal from '../common/PdfPreviewModal'
 import Skeleton from '../ui/Skeleton'
 import usePdfEditor from '../../hooks/usePdfEditor'
 import useKeepDraftOnLeave from '../../hooks/useKeepDraftOnLeave'
@@ -24,7 +24,7 @@ function PdfEditor({ id, onSaved }) {
   const { doc } = editor
   const fileInput = useRef(null)
   const [toDelete, setToDelete] = useState(null)
-  const [previewUrl, setPreviewUrl] = useState('')
+  const [previewBlob, setPreviewBlob] = useState(null) // the PDF as it will be saved, while previewing
   const [loadError, setLoadError] = useState('')
   const open = useRequest(editor.openFile)
   const fileName = () => `${doc.name.trim() || 'document'}.pdf`
@@ -46,11 +46,7 @@ function PdfEditor({ id, onSaved }) {
   }, [id])
 
   // Shows the PDF exactly as it will be saved, without downloading it
-  const preview = useRequest(async () => setPreviewUrl(URL.createObjectURL(await editor.exportBlob())))
-  const closePreview = () => {
-    URL.revokeObjectURL(previewUrl)
-    setPreviewUrl('')
-  }
+  const preview = useRequest(async () => setPreviewBlob(await editor.exportBlob()))
 
   const handleOpen = (e) => {
     const file = e.target.files[0]
@@ -214,10 +210,12 @@ function PdfEditor({ id, onSaved }) {
         ))}
       </div>
 
-      {previewUrl && (
-        <Modal title={`Preview · ${doc.name}.pdf`} onClose={closePreview} className="max-w-4xl">
-          <iframe src={previewUrl} title="PDF preview" className="h-[75vh] w-full rounded-lg border border-gray-200" />
-        </Modal>
+      {previewBlob && (
+        <PdfPreviewModal
+          title={`Preview · ${doc.name || 'Untitled document'}.pdf`}
+          load={() => Promise.resolve(previewBlob)}
+          onClose={() => setPreviewBlob(null)}
+        />
       )}
 
       {toDelete && (

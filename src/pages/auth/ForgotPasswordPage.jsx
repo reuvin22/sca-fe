@@ -7,6 +7,7 @@ import TextLink from '../../components/ui/TextLink'
 import useRequest from '../../hooks/useRequest'
 import { forgotPassword } from '../../services/authService'
 import { isEmail } from '../../utils/validators'
+import WaitingNotice from '../../components/common/WaitingNotice'
 
 function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -39,6 +40,7 @@ function ForgotPasswordPage() {
             onChange={(e) => setEmail(e.target.value)}
             error={emailError}
           />
+          <WaitingNotice active={loading} />
           <Button type="submit" loading={loading}>
             {loading ? 'Sending...' : 'Send reset link'}
           </Button>

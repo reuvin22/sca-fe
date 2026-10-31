@@ -13,6 +13,7 @@ import { finishGoogleRedirect, login, loginWithGoogle } from '../../services/aut
 import { signIn } from '../../store/authSlice'
 import { validateLogin } from '../../utils/validators'
 import googleIcon from '../../assets/google.svg'
+import WaitingNotice from '../../components/common/WaitingNotice'
 
 function LoginPage() {
   const navigate = useNavigate()
@@ -122,6 +123,7 @@ function LoginPage() {
         <Button type="submit" loading={emailLogin.loading} disabled={busy}>
           {emailLogin.loading ? 'Signing in...' : 'Sign in'}
         </Button>
+        <WaitingNotice active={busy} />
       </form>
     </>
   )
