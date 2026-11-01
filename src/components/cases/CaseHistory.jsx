@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CalendarCheck } from 'lucide-react'
+import { CalendarCheck, UserRound } from 'lucide-react'
 import Badge from '../ui/Badge'
 import Skeleton from '../ui/Skeleton'
 import useDataVersion from '../../hooks/useDataVersion'
@@ -19,7 +19,7 @@ function showValue(change, value) {
 
 const time = (iso) => new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
 
-// Timeline of what was done to a case: created, then each save with the fields that changed.
+// Timeline of what was done to a case: who did it, when, and the fields that changed (newest first).
 // Remarks show only "Remarks updated" (they are confidential).
 function CaseHistory({ caseId }) {
   const [entries, setEntries] = useState(null)
@@ -30,7 +30,16 @@ function CaseHistory({ caseId }) {
     let ignore = false
     getCaseHistory(caseId)
       .then((data) => !ignore && setEntries(data))
-      .catch(() => !ignore && setError('Could not load the action history.'))
+      .catch((err) => {
+        if (ignore) return
+        // The server in use is older than this feature (it needs to be updated / restarted)
+        const outdated = /route not found/i.test(err.message)
+        setError(
+          outdated
+            ? 'Action History needs the latest server update. Please deploy or restart the backend.'
+            : 'Could not load the action history. Please try again.',
+        )
+      })
     return () => {
       ignore = true
     }
@@ -58,6 +67,10 @@ function CaseHistory({ caseId }) {
                 <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-gray-500">
                   <CalendarCheck size={14} className="shrink-0" />
                   {formatDate(entry.createdAt.slice(0, 10))} · {time(entry.createdAt)}
+                  <span className="flex items-center gap-1">
+                    <UserRound size={14} className="shrink-0" />
+                    {entry.by}
+                  </span>
                   {status && <Badge label={status.label} className={status.className} />}
                 </p>
                 {entry.changes.length > 0 && (
