@@ -33,8 +33,9 @@ export const FOLLOW_UP = {
     tone: 'sky',
     accent: 'border-l-sky-500 text-sky-600',
   },
+  // Saved as "accomplished"; shown as Resolved
   accomplished: {
-    label: 'Accomplished',
+    label: 'Resolved',
     className: 'bg-green-100 text-green-700',
     tone: 'green',
     accent: 'border-l-green-500 text-green-600',

@@ -41,7 +41,7 @@ export const SUMMARY_COLUMNS = [
 // Totals shown at the top of the summary
 export const caseTotals = ({ cases, appointments, dueCases }) => [
   { label: 'New Cases', value: cases.total },
-  { label: 'Accomplished', value: cases.accomplished },
+  { label: 'Resolved', value: cases.accomplished },
   { label: 'Pending', value: cases.pending },
   { label: 'Overdue', value: cases.overdue },
   { label: 'Referred', value: cases.referred },

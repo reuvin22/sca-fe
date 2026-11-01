@@ -3,6 +3,7 @@ import DatePicker from '../ui/DatePicker'
 import Textarea from '../ui/Textarea'
 import Select from '../ui/Select'
 import DynamicField from '../common/DynamicField'
+import CaseHistory from './CaseHistory'
 import useForm from '../../hooks/useForm'
 import useRequest from '../../hooks/useRequest'
 import { toDateString } from '../../utils/dateHelpers'
@@ -49,14 +50,40 @@ function CaseModal({ caseItem, onSave, onDelete, onClose }) {
       error={save.error}
     >
       <div className="grid gap-4 sm:grid-cols-2">
-        <DatePicker label="Intake Date" id="intakeDate" value={form.intakeDate} onChange={handleChange} error={errors.intakeDate} />
+        <DatePicker
+          label="Intake Date"
+          id="intakeDate"
+          value={form.intakeDate}
+          onChange={handleChange}
+          error={errors.intakeDate}
+        />
         {CASE_DROPDOWNS.map((field) => (
-          <DynamicField key={field.id} field={field} value={form[field.id]} onChange={handleChange} error={errors[field.id]} />
+          <DynamicField
+            key={field.id}
+            field={field}
+            value={form[field.id]}
+            onChange={handleChange}
+            error={errors[field.id]}
+          />
         ))}
-        <DatePicker label="Follow-up Date" id="followUpDate" value={form.followUpDate} onChange={handleChange} error={errors.followUpDate} />
-        <Select label="Status" id="status" options={statusOptions} value={getCaseStatus(form)} onChange={handleChange} />
+        <DatePicker
+          label="Follow-up Date"
+          id="followUpDate"
+          value={form.followUpDate}
+          onChange={handleChange}
+          error={errors.followUpDate}
+        />
+        <Select
+          label="Status"
+          id="status"
+          options={statusOptions}
+          value={getCaseStatus(form)}
+          onChange={handleChange}
+        />
       </div>
       <Textarea label="Remarks" id="remarks" value={form.remarks} onChange={handleChange} />
+      {/* What was done to this case, when (only for saved cases) */}
+      {caseItem && <CaseHistory caseId={caseItem.id} />}
     </FormModal>
   )
 }

@@ -12,7 +12,9 @@ const renders = {
 const columns = CASE_COLUMNS.map((column) => ({ ...column, ...renders[column.id] }))
 
 function CasesTable({ cases, loading, onRowClick }) {
-  return <DataTable columns={columns} rows={cases} loading={loading} onRowClick={onRowClick} emptyText="No cases found." />
+  return (
+    <DataTable columns={columns} rows={cases} loading={loading} onRowClick={onRowClick} emptyText="No cases found." />
+  )
 }
 
 export default CasesTable

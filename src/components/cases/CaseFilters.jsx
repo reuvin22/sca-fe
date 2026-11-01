@@ -14,11 +14,24 @@ function CaseFilters({ filters, onChange, onAdd, onExport }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <div className="w-full sm:w-64">
-        <Input id="search" type="search" placeholder="Search name of learner" aria-label="Search name of learner" value={filters.search} onChange={handleChange} />
+        <Input
+          id="search"
+          type="search"
+          placeholder="Search name of learner"
+          aria-label="Search name of learner"
+          value={filters.search}
+          onChange={handleChange}
+        />
       </div>
       <DateRangePicker from={filters.from} to={filters.to} onChange={(range) => onChange({ ...filters, ...range })} />
       <div className="w-full sm:w-44">
-        <Select id="status" aria-label="Filter by follow-up status" options={statusOptions} value={filters.status} onChange={handleChange} />
+        <Select
+          id="status"
+          aria-label="Filter by follow-up status"
+          options={statusOptions}
+          value={filters.status}
+          onChange={handleChange}
+        />
       </div>
       <div className="ml-auto flex gap-2">
         <ExportMenu onExport={onExport} />

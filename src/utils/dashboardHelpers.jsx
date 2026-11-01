@@ -44,14 +44,34 @@ function casesPerDay(counts, total = 7) {
 export function getDashboardData(data) {
   const { caseStats: stats } = data
   const toRings = (items) =>
-    items.map((item, i) => ({ label: item.label, value: percent(item.count, stats.total), color: RING_COLOR[i % RING_COLOR.length] }))
+    items.map((item, i) => ({
+      label: item.label,
+      value: percent(item.count, stats.total),
+      color: RING_COLOR[i % RING_COLOR.length],
+    }))
 
   return {
     stats,
     progress: [
       { label: 'Resolved', note: 'Closed cases', value: percent(stats.closed, stats.total), color: 'stroke-primary' },
-      { label: 'Pending', note: 'For follow-up', value: percent(stats.forFollowUp, stats.total), color: 'stroke-primary' },
-      { label: 'Overdue', note: 'Past follow-up date', value: percent(stats.overdue, stats.total), color: 'stroke-primary' },
+      {
+        label: 'Pending',
+        note: 'For follow-up',
+        value: percent(stats.forFollowUp, stats.total),
+        color: 'stroke-primary',
+      },
+      {
+        label: 'Overdue',
+        note: 'Past follow-up date',
+        value: percent(stats.overdue, stats.total),
+        color: 'stroke-primary',
+      },
+      {
+        label: 'Scheduled',
+        note: 'Follow-up date ahead',
+        value: percent(stats.scheduled ?? 0, stats.total),
+        color: 'stroke-primary',
+      },
     ],
     // Cases chart: one series per filter (Weekly / Monthly / Annual)
     cases: {
