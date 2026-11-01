@@ -30,7 +30,7 @@ const HINTS = {
   feature: 'What you would like added and how it would help your work.',
 }
 
-// Bug report / feature request form. Bugs can include images and videos.
+// Bug report / feature request form. Both can include images and videos (screenshots, mock-ups, recordings).
 // Shows a thank-you message after sending.
 // `initialType` picks the starting type ('bug' | 'feature'). `onSent` runs after a request is sent.
 function SupportModal({ onClose, initialType = 'bug', onSent }) {
@@ -42,7 +42,7 @@ function SupportModal({ onClose, initialType = 'bug', onSent }) {
   })
   const send = useRequest(sendSupportRequest)
   const [sent, setSent] = useState(false)
-  // Screenshots / screen recordings, bug reports only
+  // Screenshots / screen recordings for bugs, mock-ups or examples for feature requests
   const [files, setFiles] = useState([])
 
   const handleSubmit = async (e) => {
@@ -52,7 +52,7 @@ function SupportModal({ onClose, initialType = 'bug', onSent }) {
     if (Object.keys(newErrors).length) return
     const request = { type: form.type, subject: form.subject.trim(), description: form.description.trim() }
     if (form.type === 'bug') request.severity = form.severity
-    if (await send.run(request, form.type === 'bug' ? files : [])) {
+    if (await send.run(request, files)) {
       setSent(true)
       onSent?.()
     }
@@ -101,7 +101,7 @@ function SupportModal({ onClose, initialType = 'bug', onSent }) {
         onChange={handleChange}
         error={errors.description}
       />
-      {form.type === 'bug' && <MediaPicker files={files} onChange={setFiles} disabled={send.loading} />}
+      <MediaPicker files={files} onChange={setFiles} disabled={send.loading} />
     </FormModal>
   )
 }

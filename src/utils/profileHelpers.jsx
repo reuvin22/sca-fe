@@ -17,7 +17,6 @@ export const SCHOOL_FIELDS = [
   { id: 'schoolYear', label: 'School Year', required: true },
   { id: 'reportingMonth', label: 'Reporting Month', required: true },
   { id: 'schoolHead', label: 'School Head', required: true },
-  { id: 'privacy', label: 'Privacy Classification', required: true },
 ]
 
 export const REQUIRED_PROFILE_FIELDS = [...PERSONAL_FIELDS, ...SCHOOL_FIELDS].filter((field) => field.required)
